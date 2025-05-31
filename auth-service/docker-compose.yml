@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: .
+    container_name: auth-service
+    image: auth-service:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres   # Lưu ý: postgres phải chạy rồi, hoặc bạn quản lý start bằng tay
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/E_COMMERCE_PLATFORM_AUTH
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+    networks:
+      - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true

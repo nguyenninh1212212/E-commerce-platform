@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: product-service
+  data:
+    mongodb:
+      uri: mongodb://developer:Password123@localhost:27017/attributedb?authSource=admin
+
+server:
+  port: 8083

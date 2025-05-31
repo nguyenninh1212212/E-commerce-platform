@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  cloud-service:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      ALLOWED_MIME_TYPES: image/png,image/jpeg,image/jpg
+      MAX_FILE_SIZE: 55242880
+      API_CLOUD_KEY: 863938529749295
+      API_CLOUD_SECRET: ezwBvkmvEwE7ZzquiJ35gNQW2PU
+      API_CLOUD_NAME: dxpyuj1mm
+    restart: unless-stopped

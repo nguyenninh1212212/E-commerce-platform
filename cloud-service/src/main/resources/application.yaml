@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: cloud-service
+
+server:
+  port: 8081
+
+cloudinary:
+  apiKey: ${API_CLOUD_KEY}
+  apiSecret: ${API_CLOUD_SECRET}
+  cloudName: ${API_CLOUD_NAME}
+  maxFileSize: ${MAX_FILE_SIZE}
+  allowedMimeTypes: ${ALLOWED_MIME_TYPES}
