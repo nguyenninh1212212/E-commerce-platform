@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class Attribute {
     private String name;
     private List<String> values;
+
 }

@@ -22,7 +22,6 @@ public class AttributeController {
 
     private final AttributeServ attributeServ;
 
-    // --- CATEGORY ---
     @Operation(summary = "Thêm category mới")
     @PostMapping("/category")
     public ResponseEntity<String> addCategory(@RequestParam String category) {

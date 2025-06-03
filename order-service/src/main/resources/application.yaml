@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      uri: mongodb://developer:Password123@localhost:27017/orderdb?authSource=admin
+server:
+  port: 8084
+grpc:
+  server:
+    port: 4044
