@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.example.product_service.model.Attributes;
+import com.example.product_service.model.Category;
 import com.example.product_service.model.Variants;
 
 import lombok.AllArgsConstructor;
@@ -26,11 +27,11 @@ public class Product {
     private int sales;
     private int inventory;
     private double price;
+    private double discount;
     private String sellerId;
     private int rating;
     private int reviewCount;
     private List<Attributes> attributes;
-    private List<Variants> variants;
-    private List<String> tags;
+    private Category tag;
     private List<String> imageUrl;
 }

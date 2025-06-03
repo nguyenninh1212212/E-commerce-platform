@@ -1,7 +1,5 @@
 package com.example.variant_service.repos;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

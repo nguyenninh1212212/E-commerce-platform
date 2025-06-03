@@ -3,7 +3,12 @@ spring:
     name: product-service
   data:
     mongodb:
-      uri: mongodb://developer:Password123@localhost:27017/attributedb?authSource=admin
+      uri: mongodb://developer:password123@localhost:27017/productdb?authSource=admin
+grpc:
+  client:
+    variant-service:
+      address: localhost
+      port: 4049
 
 server:
   port: 8083

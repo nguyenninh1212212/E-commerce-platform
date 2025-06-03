@@ -7,5 +7,6 @@ spring:
 grpc:
   server:
     port: 4049
+
 server:
   port: 8089

@@ -2,13 +2,19 @@ package com.example.product_service.model.dto;
 
 import java.util.List;
 
-import com.example.product_service.model.Attributes;
-import com.example.product_service.model.Variants;
+import org.checkerframework.checker.units.qual.A;
 
+import com.example.product_service.model.Attributes;
+import com.example.product_service.model.Category;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
 public class ProductBase {
     private String name;
@@ -18,7 +24,6 @@ public class ProductBase {
     private double price;
     private String sellerId;
     private List<Attributes> attributes;
-    private List<Variants> variants;
-    private List<String> tags;
+    private Category tags;
     private List<String> imageUrl;
 }

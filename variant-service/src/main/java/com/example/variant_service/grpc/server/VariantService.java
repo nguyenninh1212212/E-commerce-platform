@@ -2,7 +2,6 @@ package com.example.variant_service.grpc.server;
 
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.variant_service.model.dto.req.VariantReq;

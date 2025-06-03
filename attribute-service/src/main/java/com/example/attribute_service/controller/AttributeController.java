@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/attributes")
@@ -22,7 +24,12 @@ public class AttributeController {
 
     private final AttributeServ attributeServ;
 
-    @Operation(summary = "Thêm category mới")
+    @GetMapping("/category/all")
+    public ResponseEntity<?> getCategoryAttributes() {
+
+        return ResponseEntity.ok(attributeServ.getAllCategoryAttributes());
+    }
+
     @PostMapping("/category")
     public ResponseEntity<String> addCategory(@RequestParam String category) {
         attributeServ.addCategory(category);
@@ -34,10 +41,6 @@ public class AttributeController {
         return ResponseEntity.ok(attributeServ.getCategories());
     }
 
-    @GetMapping("/category/all")
-    public ResponseEntity<List<CategoryAttribute>> getAllCategories() {
-        return ResponseEntity.ok(attributeServ.getAllCategories());
-    }
 
     @DeleteMapping("/category")
     public ResponseEntity<String> deleteCategory(@RequestParam String id) {

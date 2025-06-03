@@ -35,7 +35,8 @@
       "mainClass": "com.example.attribute_service.AttributeServiceApplication",
       "projectName": "attribute-service",
       "args": "",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=57027 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=attribute-service"
     },
     {
       "type": "java",
@@ -44,6 +45,17 @@
       "cwd": "${workspaceFolder}",
       "mainClass": "com.example.variant_service.VariantServiceApplication",
       "projectName": "variant-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=58069 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=variant-service"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-ProductServiceApplication<product-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.product_service.ProductServiceApplication",
+      "projectName": "product-service",
       "args": "",
       "envFile": "${workspaceFolder}/.env"
     }

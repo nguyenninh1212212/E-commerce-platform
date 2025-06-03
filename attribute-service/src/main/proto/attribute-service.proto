@@ -1,7 +1,26 @@
-sysntax = "proto3";
+syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "attribute";
 
-service AttributeService{
+message Empty {} 
+
+message Category {
+  string id = 1;
+  string name = 2;
+}
+
+message Attribute {
+  string name = 1;
+  repeated string values = 2;
+}
+
+message CategoryAttribute {
+  Category category = 1;
+  repeated Attribute attributes = 2;
+}
+
+service AttributeService {
+  rpc getCategories (Empty) returns (stream Category);
+  rpc getCategoryAttribute (Empty) returns (stream CategoryAttribute);
 }

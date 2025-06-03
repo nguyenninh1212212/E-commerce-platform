@@ -2,7 +2,6 @@ package com.example.variant_service.excep;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.variant_service.model.dto.res.ApiRes;

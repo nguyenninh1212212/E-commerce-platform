@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.attribute_service.model.dto.res.Attribute;
 import com.example.attribute_service.model.dto.res.CategoriesDTO;
+import com.example.attribute_service.model.dto.res.CategoryAttributesRes;
 import com.example.attribute_service.model.entity.CategoryAttribute;
 import com.example.attribute_service.repos.AttributeRepo;
 
@@ -44,6 +45,20 @@ public class AttributeServ {
     private CategoryAttribute getCategoryAttribute(String id) {
         return attributeRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+    }
+
+    public List<CategoryAttributesRes> getAllCategoryAttributes() {
+        List<CategoryAttribute> categoryAttributes = attributeRepo.findAll();
+        List<CategoryAttributesRes> categoryAttributesRes = categoryAttributes.stream()
+                .map(cat -> CategoryAttributesRes.builder()
+                        .category(CategoriesDTO.builder()
+                                .id(cat.getId())
+                                .name(cat.getCategory())
+                                .build())
+                        .attributes(cat.getAttributes() != null ? cat.getAttributes() : new ArrayList<>())
+                        .build())
+                .collect(Collectors.toList());
+        return categoryAttributesRes;
     }
 
     public void addCategory(String category) {
@@ -171,10 +186,6 @@ public class AttributeServ {
     public List<Attribute> getAttributeByCategoryId(String id) {
         CategoryAttribute categoryAttribute = getCategoryAttribute(id);
         return categoryAttribute.getAttributes();
-    }
-
-    public List<CategoryAttribute> getAllCategories() {
-        return attributeRepo.findAll();
     }
 
     public List<CategoriesDTO> getCategories() {

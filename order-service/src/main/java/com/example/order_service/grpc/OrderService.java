@@ -1,6 +1,5 @@
 package com.example.order_service.grpc;
 
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,7 +10,6 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import ordering.OrderRequest;
 import ordering.OrderResponse;
 import ordering.OrderServiceGrpc;
-import ordering.Status;
 
 @GrpcService
 public class OrderService extends OrderServiceGrpc.OrderServiceImplBase {

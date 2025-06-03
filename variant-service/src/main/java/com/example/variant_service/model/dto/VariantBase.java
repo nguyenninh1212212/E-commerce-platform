@@ -6,7 +6,6 @@ import com.example.variant_service.model.Attribute;
 import com.example.variant_service.model.enums.Status;
 import com.example.variant_service.validation.add;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
