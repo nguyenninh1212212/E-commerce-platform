@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ApiRes {
-    private String data;
+public class ApiRes<T> {
+    private T data;
     private int status;
 
 }

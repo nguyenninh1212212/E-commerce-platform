@@ -12,4 +12,3 @@ services:
       API_CLOUD_KEY: 863938529749295
       API_CLOUD_SECRET: ezwBvkmvEwE7ZzquiJ35gNQW2PU
       API_CLOUD_NAME: dxpyuj1mm
-    restart: unless-stopped

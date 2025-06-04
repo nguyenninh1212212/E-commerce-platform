@@ -2,8 +2,6 @@ package com.example.product_service.model.dto;
 
 import java.util.List;
 
-import org.checkerframework.checker.units.qual.A;
-
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Category;
 
@@ -25,5 +23,4 @@ public class ProductBase {
     private String sellerId;
     private List<Attributes> attributes;
     private Category tags;
-    private List<String> imageUrl;
 }

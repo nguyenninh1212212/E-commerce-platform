@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  variant-service:
+    build: .
+    image: variant-service:latest
+    container_name: variant-service
+    ports: 
+      - "8089:8089"
+      - "4049:4049" 
+    networks:
+      - E_COMMERCE_PLATFORM-net
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true      

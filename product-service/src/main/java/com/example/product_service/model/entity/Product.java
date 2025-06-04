@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Category;
-import com.example.product_service.model.Variants;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

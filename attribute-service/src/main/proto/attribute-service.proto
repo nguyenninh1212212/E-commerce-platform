@@ -19,8 +19,11 @@ message CategoryAttribute {
   Category category = 1;
   repeated Attribute attributes = 2;
 }
+message getId{
+  string id =1;
+}
 
 service AttributeService {
-  rpc getCategories (Empty) returns (stream Category);
+  rpc getCategories (getId) returns (stream Category);
   rpc getCategoryAttribute (Empty) returns (stream CategoryAttribute);
 }

@@ -1,6 +1,7 @@
-package com.example.attribute_service.model.dto.res;
+package com.example.attribute_service.model.dto;
 
 import java.util.List;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Attribute {
+    private String id;
     private String name;
-    private List<String> values;
+    private Set<String> values;
 
 }

@@ -14,7 +14,7 @@ import lombok.Setter;
 public class ProductFeaturedRes {
     private String id;
     private String name;
-    private String img;
+    private String image;
     private int sales;
     private double price;
 }

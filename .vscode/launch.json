@@ -58,6 +58,16 @@
       "projectName": "product-service",
       "args": "",
       "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-CloudServiceApplication<cloud-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.cloud_service.CloudServiceApplication",
+      "projectName": "cloud-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

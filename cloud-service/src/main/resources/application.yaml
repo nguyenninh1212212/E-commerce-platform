@@ -6,8 +6,11 @@ server:
   port: 8081
 
 cloudinary:
-  apiKey: ${API_CLOUD_KEY}
-  apiSecret: ${API_CLOUD_SECRET}
-  cloudName: ${API_CLOUD_NAME}
-  maxFileSize: ${MAX_FILE_SIZE}
-  allowedMimeTypes: ${ALLOWED_MIME_TYPES}
+  apiKey: 863938529749295
+  apiSecret: ezwBvkmvEwE7ZzquiJ35gNQW2PU
+  cloudName: dxpyuj1mm
+  maxFileSize: 55242880
+  allowedMimeTypes:
+    - image/png
+    - image/jpeg
+    - image/jpg

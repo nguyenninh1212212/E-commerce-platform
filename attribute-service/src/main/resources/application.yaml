@@ -3,7 +3,7 @@ spring:
     name: attribute-service
   data:
     mongodb:
-      uri: mongodb://adminAttribute:admin123@localhost:27017/attributedb?authSource=admin
+      uri: mongodb://developer:password123@localhost:27017/attributedb?authSource=admin
 
 server:
   port: 8082

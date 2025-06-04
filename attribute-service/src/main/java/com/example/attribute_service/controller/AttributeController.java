@@ -1,6 +1,6 @@
 package com.example.attribute_service.controller;
 
-import com.example.attribute_service.model.dto.res.Attribute;
+import com.example.attribute_service.model.dto.Attribute;
 import com.example.attribute_service.model.dto.res.CategoriesDTO;
 import com.example.attribute_service.model.entity.CategoryAttribute;
 import com.example.attribute_service.service.AttributeServ;
@@ -41,7 +41,6 @@ public class AttributeController {
         return ResponseEntity.ok(attributeServ.getCategories());
     }
 
-
     @DeleteMapping("/category")
     public ResponseEntity<String> deleteCategory(@RequestParam String id) {
         attributeServ.deleteCategory(id);
@@ -63,14 +62,6 @@ public class AttributeController {
             @PathVariable String categoryId,
             @RequestBody Attribute attribute) {
         attributeServ.updateAttribute(categoryId, attribute);
-        return ResponseEntity.ok("success");
-    }
-
-    @PutMapping("/{categoryId}/update-value")
-    public ResponseEntity<String> updateAttributeValue(
-            @PathVariable String categoryId,
-            @RequestBody Attribute attribute) {
-        attributeServ.updateAttributeValue(categoryId, attribute);
         return ResponseEntity.ok("success");
     }
 

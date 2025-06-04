@@ -2,6 +2,8 @@ package com.example.attribute_service.model.dto.res;
 
 import java.util.List;
 
+import com.example.attribute_service.model.dto.Attribute;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

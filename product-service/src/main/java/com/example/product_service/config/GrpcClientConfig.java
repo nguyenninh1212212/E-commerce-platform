@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class VariantGrpcClientConfig {
+public class GrpcClientConfig {
     @Bean
     public VariantServiceGrpcClient variantServiceGrpcClient(
             @Value("${grpc.client.variant-service.address}") String host,

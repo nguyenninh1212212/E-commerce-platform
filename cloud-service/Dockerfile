@@ -12,4 +12,4 @@ COPY --from=build /target/cloud-service-0.0.1-SNAPSHOT.jar ./app.jar
 
 EXPOSE 8081
 
-ENTRYPOINT ["java", "--enable-preview", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

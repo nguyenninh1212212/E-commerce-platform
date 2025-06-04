@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.product_service.model.dto.res.ApiRes;
-import com.google.api.Http;
 
 @ControllerAdvice
 public class GlobalException {
         @ExceptionHandler(Exception.class)
-        public ResponseEntity<ApiRes> handleException(Exception e) {
-                ApiRes response = ApiRes.builder()
+        public ResponseEntity<ApiRes<String>> handleException(Exception e) {
+                ApiRes<String> response = ApiRes.<String>builder()
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                                 .data(e.getMessage())
                                 .build();
@@ -22,8 +21,8 @@ public class GlobalException {
         }
 
         @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
-        public ResponseEntity<ApiRes> handleBadRequest(IllegalArgumentException e) {
-                ApiRes response = ApiRes.builder()
+        public ResponseEntity<ApiRes<String>> handleBadRequest(IllegalArgumentException e) {
+                ApiRes<String> response = ApiRes.<String>builder()
                                 .status(HttpStatus.BAD_REQUEST.value())
                                 .data(e.getMessage())
                                 .build();

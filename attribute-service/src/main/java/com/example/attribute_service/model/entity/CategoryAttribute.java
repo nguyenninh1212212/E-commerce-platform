@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.example.attribute_service.model.dto.res.Attribute;
+import com.example.attribute_service.model.dto.Attribute;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
