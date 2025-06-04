@@ -1,4 +1,4 @@
-package com.example.product_service.service;
+package com.example.product_service.service.Impl;
 
 import java.io.IOException;
 
@@ -36,11 +36,31 @@ public class CloudClientServ {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "http://cloud-service:8081/files/upload", request, String.class);
+                    "http://localhost:8081/file/upload", request, String.class);
 
             return response.getBody();
 
         } catch (IOException e) {
+            throw new RuntimeException("File upload failed: " + e.getMessage());
+        }
+    }
+
+    public String deleteFromCloud(String url) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("url", url);
+
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "http://localhost:8081/file/delete", request, String.class);
+
+            return response.getBody();
+
+        } catch (Exception e) {
             throw new RuntimeException("File upload failed: " + e.getMessage());
         }
     }

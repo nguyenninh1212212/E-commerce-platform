@@ -26,12 +26,16 @@ public class VariantServiceGrpcClient {
 
         public List<VariantResponse> getVariantByProductId(String productId) {
                 log.info("Fetching variant by productId: {}", productId);
-                GetVariantsRequest request = GetVariantsRequest.newBuilder()
-                                .setProductId(productId)
-                                .build();
-                Iterator<VariantResponse> iterator = blockingStub.getVariants(request);
-                List<VariantResponse> response = new ArrayList<>();
-                iterator.forEachRemaining(response::add);
-                return response != null ? response : new ArrayList<>();
+                try {
+                        GetVariantsRequest request = GetVariantsRequest.newBuilder()
+                                        .setProductId(productId)
+                                        .build();
+                        Iterator<VariantResponse> iterator = blockingStub.getVariants(request);
+                        List<VariantResponse> response = new ArrayList<>();
+                        iterator.forEachRemaining(response::add);
+                        return response;
+                } catch (Exception e) {
+                        return new ArrayList<>();
+                }
         }
 }

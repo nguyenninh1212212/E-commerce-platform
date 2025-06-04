@@ -3,12 +3,20 @@ version: '3.8'
 services:
   cloud-service:
     build: .
+    image: cloud-service:latest
+    container_name: cloud-service
     ports:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       ALLOWED_MIME_TYPES: image/png,image/jpeg,image/jpg
       MAX_FILE_SIZE: 55242880
-      API_CLOUD_KEY: 863938529749295
-      API_CLOUD_SECRET: ezwBvkmvEwE7ZzquiJ35gNQW2PU
-      API_CLOUD_NAME: dxpyuj1mm
+      API_CLOUD_KEY: ${API_CLOUD_KEY}
+      API_CLOUD_SECRET: ${API_CLOUD_SECRET}
+      API_CLOUD_NAME: ${API_CLOUD_NAME}
+    networks:
+      - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true

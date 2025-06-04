@@ -12,5 +12,5 @@ services:
       - PORT=8082
 
     networks:
-      - E_COMMERCE_NETWORK
+      - E_COMMERCE_PLATFORM-net
       
