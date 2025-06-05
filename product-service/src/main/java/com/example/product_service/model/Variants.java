@@ -19,9 +19,6 @@ public class Variants {
     private String productId;
     private List<Attributes> attributes;
     private VariantsStatus status;
-    private String sku;
-    private String barcode;
     private Double price;
-    private String imgurl;
     private int quantity;
 }

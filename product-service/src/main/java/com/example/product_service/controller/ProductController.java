@@ -1,15 +1,12 @@
 package com.example.product_service.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.product_service.model.dto.req.ProductReq;
 import com.example.product_service.model.dto.req.ProductUpdateReq;
@@ -37,7 +33,7 @@ public class ProductController {
 
         private final ProductService productService;
 
-        @PostMapping
+        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<ApiRes<String>> addProduct(
                         @RequestPart("req") ProductReq req,
                         @RequestPart("img") MultipartFile img) {

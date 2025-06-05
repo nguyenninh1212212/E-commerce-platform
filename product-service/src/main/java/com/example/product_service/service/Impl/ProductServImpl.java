@@ -21,6 +21,7 @@ import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.VariantsStatus;
+import com.example.product_service.service.CloudClientService;
 import com.example.product_service.service.ProductService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,7 @@ import variant.VariantResponse;
 public class ProductServImpl implements ProductService {
         private final MongoTemplate mongoTemplate;
         private final VariantServiceGrpcClient variantServiceGrpcClient;
-        private final CloudClientServ cloudClientServ;
+        private final CloudClientService cloudClientServ;
 
         @Override
         public void addProduct(ProductReq req, MultipartFile img) {
@@ -45,7 +46,6 @@ public class ProductServImpl implements ProductService {
                                 .tag(req.getTags())
                                 .reviewCount(0)
                                 .rating(0)
-                                .discount(req.getPrice() - (req.getPrice() * req.getSales()) / 100)
                                 .price(req.getPrice())
                                 .attributes(req.getAttributes())
                                 .sales(req.getSales())
@@ -68,8 +68,6 @@ public class ProductServImpl implements ProductService {
                                 .map(variantResponse -> Variants.builder()
                                                 .id(variantResponse.getId())
                                                 .quantity(variantResponse.getQuantity())
-                                                .sku(variantResponse.getSku())
-                                                .barcode(variantResponse.getBarcode())
                                                 .productId(id)
                                                 .attributes(variantResponse.getAttributesList().stream()
                                                                 .map(attr -> Attributes.builder()
@@ -78,8 +76,6 @@ public class ProductServImpl implements ProductService {
                                                                                 .build())
                                                                 .toList())
                                                 .status(VariantsStatus.valueOf(variantResponse.getStatus().name()))
-                                                .barcode(variantResponse.getBarcode())
-                                                .imgurl(variantResponse.getImgurl())
                                                 .price(variantResponse.getPrice())
                                                 .build())
                                 .toList() : new java.util.ArrayList<>();
@@ -88,7 +84,7 @@ public class ProductServImpl implements ProductService {
                                 .name(product.getName())
                                 .description(product.getDescription())
                                 .price(product.getPrice())
-                                .discount(product.getDiscount())
+                                .discount(product.getPrice() - (product.getPrice() * product.getSales()) / 100)
                                 .sales(product.getSales())
                                 .inventory(product.getInventory())
                                 .rating(product.getRating())

@@ -51,13 +51,9 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
             for (VariantRes variant : variantList) {
                 VariantResponse.Builder builder = VariantResponse.newBuilder()
                         .setId(variant.getId())
-                        .setSku(variant.getSku())
-                        .setBarcode(variant.getBarcode())
                         .setPrice(variant.getPrice())
-                        .setImgurl(variant.getImgurl())
                         .setQuantity(variant.getQuantity())
                         .setStatus(toProtoStatus(variant.getStatus()));
-
                 builder.addAllAttributes(
                         variant.getAttributes().stream()
                                 .map(attr -> Attribute.newBuilder()
@@ -85,10 +81,7 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
         try {
             request.getVariantsList().forEach(variantReq -> {
                 VariantReq variant = VariantReq.builder()
-                        .sku(variantReq.getSku())
-                        .barcode(variantReq.getBarcode())
                         .price(variantReq.getPrice())
-                        .imgurl(variantReq.getImgurl())
                         .quantity(variantReq.getQuantity())
                         .status(toStatus(variantReq.getStatus()))
                         .attributes(variantReq.getAttributesList().stream()

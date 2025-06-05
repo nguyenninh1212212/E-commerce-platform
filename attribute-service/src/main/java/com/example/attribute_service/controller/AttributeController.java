@@ -2,10 +2,8 @@ package com.example.attribute_service.controller;
 
 import com.example.attribute_service.model.dto.Attribute;
 import com.example.attribute_service.model.dto.res.CategoriesDTO;
-import com.example.attribute_service.model.entity.CategoryAttribute;
 import com.example.attribute_service.service.AttributeServ;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 

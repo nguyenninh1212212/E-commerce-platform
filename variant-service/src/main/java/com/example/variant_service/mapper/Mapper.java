@@ -14,10 +14,7 @@ public class Mapper {
                 .productId(variant.getProductId())
                 .attributes(variant.getAttributes())
                 .status(variant.getStatus())
-                .sku(variant.getSku())
-                .barcode(variant.getBarcode())
                 .price(variant.getPrice())
-                .imgurl(variant.getImgurl())
                 .quantity(variant.getQuantity())
                 .build();
     }
@@ -25,12 +22,9 @@ public class Mapper {
     public Variant toEntity(VariantReq variantReq, String productId) {
         return Variant.builder()
                 .productId(productId)
-                .attributes(variantReq.getAttributes())
+                .attributes(variantReq.getAttributes()) 
                 .status(variantReq.getStatus())
-                .sku(variantReq.getSku())
-                .barcode(variantReq.getBarcode())
                 .price(variantReq.getPrice())
-                .imgurl(variantReq.getImgurl())
                 .quantity(variantReq.getQuantity())
                 .build();
     }

@@ -13,15 +13,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.product_service.model.dto.req.MultipartInputStreamFileResource;
+import com.example.product_service.service.CloudClientService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CloudClientServ {
+public class CloudClientServImpl implements CloudClientService {
 
     private final RestTemplate restTemplate;
 
+    @Override
     public String uploadToCloud(MultipartFile file, String folder) {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -45,6 +47,7 @@ public class CloudClientServ {
         }
     }
 
+    @Override
     public String deleteFromCloud(String url) {
         try {
             HttpHeaders headers = new HttpHeaders();

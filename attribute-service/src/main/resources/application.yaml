@@ -3,7 +3,10 @@ spring:
     name: attribute-service
   data:
     mongodb:
-      uri: mongodb://developer:password123@localhost:27017/attributedb?authSource=admin
-
+      uri: ${MONGODB_URI}
+grpc:
+  server:
+    address: ${GRPC_ADDRESS}
+    port: ${GRPC_PORT}
 server:
-  port: 8082
+  port: ${PORT}

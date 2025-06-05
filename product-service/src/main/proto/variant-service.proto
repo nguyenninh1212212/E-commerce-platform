@@ -21,11 +21,8 @@ message VariantResponse {
   string id = 1;
   repeated Attribute attributes = 2;
   Status status = 3;
-  string sku = 4;
-  string barcode = 5;
-  double price = 6;
-  string imgurl = 7;
-  int32 quantity = 8;
+  double price = 4;
+  int32 quantity = 5;
 }
 
 message GetVariantsRequest {
@@ -35,11 +32,8 @@ message VariantsRequest {
   string productId = 1;
   repeated Attribute attributes = 2;
   Status status = 3;
-  string sku = 4;
-  string barcode = 5;
-  double price = 6;
-  string imgurl = 7;
-  int32 quantity = 8;
+  double price = 4;
+  int32 quantity = 5;
 }
 
 message CreateVariantsRequest {

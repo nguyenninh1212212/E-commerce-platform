@@ -35,13 +35,4 @@ public class VariantBase {
     @NotNull(groups = { add.class })
     private List<Attribute> attributes;
 
-    @NotBlank(groups = { add.class })
-    private String sku;
-
-    @NotBlank(groups = { add.class })
-    private String barcode;
-
-    @NotBlank(groups = { add.class })
-    private String imgurl;
-
 }

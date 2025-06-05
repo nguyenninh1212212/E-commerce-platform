@@ -25,10 +25,7 @@ public class Variant {
     private String productId;
     private List<Attribute> attributes;
     private Status status;
-    private String sku;
-    private String barcode;
     private Double price;
-    private String imgurl;
     private int quantity;
     private Instant createdAt;
     private Instant updatedAt;

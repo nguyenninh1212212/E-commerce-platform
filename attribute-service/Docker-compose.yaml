@@ -2,15 +2,23 @@ version: '3.8'
 
 services:
   attribute-service:
-    image: attribute-service:latest
+    build: .
+    image: attribute-service
     container_name: attribute-service
     ports:
       - "8082:8082"
-    environment:
+      - "4042:4042"
+    environment: 
       - SPRING_PROFILES_ACTIVE=dev
-      - MONGODB_URI=mongodb://adminAttribute:admin123@localhost:27017/attributedb?authSource=admin
+      - MONGODB_URI=mongodb://adminAttribute:admin123@mongodb:27017/attributedb?authSource=admin
       - PORT=8082
-
+      - GRPC_PORT=4042
+      - GRPC_ADDRESS=0.0.0.0
     networks:
       - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true 
+
       

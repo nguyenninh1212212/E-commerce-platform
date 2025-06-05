@@ -8,13 +8,12 @@ spring:
     multipart:
       enabled: true
       strict-servlet-compliance: true
-      
 
 grpc:
   client:
-    variant-service:
-      address: localhost
-      port: 4049
+    variant-client:
+      address: static://localhost:4049
+      negotiationType: PLAINTEXT
 
 server:
   port: 8083
