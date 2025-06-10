@@ -1,3 +1,6 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: product-service
@@ -8,12 +11,17 @@ spring:
     multipart:
       enabled: true
       strict-servlet-compliance: true
+  # kafka:
+  #   producer:
+  #     key-serializer: org.apache.kafka.common.serialization.SpringSerializer
+  #     value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  #   bootstrap-servers:
+  #     - localhost:29092
 
 grpc:
+  server:
+    port: 4043
   client:
     variant-client:
       address: static://localhost:4049
       negotiationType: PLAINTEXT
-
-server:
-  port: 8083

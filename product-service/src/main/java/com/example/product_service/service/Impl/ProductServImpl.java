@@ -21,7 +21,6 @@ import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.VariantsStatus;
-import com.example.product_service.service.CloudClientService;
 import com.example.product_service.service.ProductService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,11 +33,9 @@ import variant.VariantResponse;
 public class ProductServImpl implements ProductService {
         private final MongoTemplate mongoTemplate;
         private final VariantServiceGrpcClient variantServiceGrpcClient;
-        private final CloudClientService cloudClientServ;
 
         @Override
-        public void addProduct(ProductReq req, MultipartFile img) {
-                String url = cloudClientServ.uploadToCloud(img, "image");
+        public String addProduct(ProductReq req, String img) {
                 Product product = Product.builder()
                                 .name(req.getName())
                                 .price(req.getPrice())
@@ -51,9 +48,10 @@ public class ProductServImpl implements ProductService {
                                 .sales(req.getSales())
                                 .inventory(req.getInventory())
                                 .sellerId("abc123")
-                                .imageUrl(List.of(url))
+                                .imageUrl(List.of(img))
                                 .build();
                 mongoTemplate.save(product);
+                return product.getId();
         }
 
         @Override
@@ -146,32 +144,4 @@ public class ProductServImpl implements ProductService {
                 mongoTemplate.remove(product);
         }
 
-        @Override
-
-        public void updateProductById(String id, ProductUpdateReq req, MultipartFile img) {
-                Product product = mongoTemplate.findById(id, Product.class);
-                if (product == null) {
-                        throw new IllegalArgumentException("Product not found with id: " + id);
-                }
-                if (img != null && !img.isEmpty()) {
-                        for (String imgs : req.getImages()) {
-                                if (req.getImages() != null && !req.getImages().isEmpty()) {
-                                        cloudClientServ.deleteFromCloud(imgs);
-                                        product.getImageUrl().clear();
-                                }
-                        }
-                        String url = cloudClientServ.uploadToCloud(img, "image");
-                        product.setImageUrl(List.of(url));
-                }
-                ObjectMapper objectMapper = new ObjectMapper();
-                Update update = new Update();
-                Map<String, Object> dtoMap = objectMapper.convertValue(req, new TypeReference<Map<String, Object>>() {
-                });
-                Map<String, Object> fieldFilter = dtoMap.entrySet().stream()
-                                .filter(entry -> entry.getValue() != null)
-                                .collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                fieldFilter.forEach(update::set);
-                mongoTemplate.updateFirst(
-                                Query.query(Criteria.where("id").is(id)), update, Product.class);
-        }
 }

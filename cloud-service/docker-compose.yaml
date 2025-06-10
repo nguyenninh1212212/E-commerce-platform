@@ -7,6 +7,7 @@ services:
     container_name: cloud-service
     ports:
       - "8081:8081"
+      - "4041:4041"
     environment:
       SPRING_PROFILES_ACTIVE: prod
       ALLOWED_MIME_TYPES: image/png,image/jpeg,image/jpg

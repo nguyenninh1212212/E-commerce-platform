@@ -23,6 +23,7 @@ message VariantResponse {
   Status status = 3;
   double price = 5;
   int32 quantity = 6;
+  string sku = 7;
 }
 
 message GetVariantsRequest {
@@ -34,6 +35,7 @@ message VariantsRequest {
   Status status = 3;
   double price = 5;
   int32 quantity = 6;
+  string sku = 7;
 }
 
 message CreateVariantsRequest {
@@ -41,7 +43,7 @@ message CreateVariantsRequest {
 }
 
 message res{
-  string value =1;
+  string value  = 1;
 }
 service VariantService {
   rpc GetVariants(GetVariantsRequest) returns (stream VariantResponse);

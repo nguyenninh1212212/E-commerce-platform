@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import io.grpc.ManagedChannel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,17 +19,8 @@ import variant.VariantServiceGrpc;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VariantServiceGrpcClient {
-        private static Logger log = LoggerFactory.getLogger(VariantServiceGrpcClient.class);
         @GrpcClient("variant-client")
         private VariantServiceGrpc.VariantServiceBlockingStub blockingStub;
-
-        public VariantServiceGrpcClient(String host, int port) {
-                log.info("VariantServiceGrpcClient initialized: host={}, port={}", host, port);
-                ManagedChannel channel = io.grpc.ManagedChannelBuilder.forAddress(host, port)
-                                .usePlaintext()
-                                .build();
-                this.blockingStub = VariantServiceGrpc.newBlockingStub(channel);
-        }
 
         public List<VariantResponse> getVariantByProductId(String productId) {
                 try {
@@ -46,12 +34,10 @@ public class VariantServiceGrpcClient {
                         iterator.forEachRemaining(response::add);
                         long end = System.currentTimeMillis();
                         log.info("Time to fetch and collect variants: {} ms", end - start);
-                        log.info(productId + "suceesssdadsssssssssss");
 
                         return response;
                 } catch (Exception e) {
-                        // return new ArrayList<>();
-                        throw new RuntimeException(e.getMessage());
+                        return new ArrayList<>();
                 }
         }
 }

@@ -11,7 +11,7 @@ import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 
 public interface ProductService {
-    void addProduct(ProductReq req, MultipartFile img);
+    String addProduct(ProductReq req, String img);
 
     ProductRes getProductById(String id);
 
@@ -23,5 +23,4 @@ public interface ProductService {
 
     void deleteProductById(String id);
 
-    void updateProductById(String id, ProductUpdateReq req, MultipartFile img);
 }

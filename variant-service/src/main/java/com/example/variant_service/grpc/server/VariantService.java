@@ -52,6 +52,7 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                 VariantResponse.Builder builder = VariantResponse.newBuilder()
                         .setId(variant.getId())
                         .setPrice(variant.getPrice())
+                        .setSku(variant.getSku())
                         .setQuantity(variant.getQuantity())
                         .setStatus(toProtoStatus(variant.getStatus()));
                 builder.addAllAttributes(
@@ -84,15 +85,16 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                         .price(variantReq.getPrice())
                         .quantity(variantReq.getQuantity())
                         .status(toStatus(variantReq.getStatus()))
+                        .sku(variantReq.getSku())
                         .attributes(variantReq.getAttributesList().stream()
                                 .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
                                         attr.getValuesList()))
                                 .collect(Collectors.toList()))
+
                         .build();
 
                 variantServ.createVariant(variant, variantReq.getProductId());
             });
-
             res response = res.newBuilder()
                     .setValue("Variants created successfully")
                     .build();

@@ -33,18 +33,6 @@ public class ProductController {
 
         private final ProductService productService;
 
-        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ResponseEntity<ApiRes<String>> addProduct(
-                        @RequestPart("req") ProductReq req,
-                        @RequestPart("img") MultipartFile img) {
-                productService.addProduct(req, img);
-                return ResponseEntity.ok(
-                                ApiRes.<String>builder()
-                                                .status(HttpStatus.CREATED.value())
-                                                .data("Product added successfully")
-                                                .build());
-        }
-
         @GetMapping("/{id}")
         public ResponseEntity<ApiRes<ProductRes>> getProductById(@PathVariable String id) {
                 ProductRes productRes = productService.getProductById(id);

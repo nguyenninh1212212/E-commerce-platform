@@ -1,7 +1,6 @@
 package com.example.product_service.model;
 
 import java.util.List;
-import java.util.Map;
 
 import com.example.product_service.model.enums.VariantsStatus;
 

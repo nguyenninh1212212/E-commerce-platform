@@ -1,14 +1,13 @@
 package com.example.cloud_service.cloud;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.cloud_service.config.CloudConfig;
 
@@ -17,19 +16,15 @@ public class CloudServ {
 
     private final Cloudinary cloudinary;
     private final long maxFileSize;
-    private final List<String> allowedMimeTypes;
 
     public CloudServ(Cloudinary cloudinary, CloudConfig cloudConfig) {
         this.cloudinary = cloudinary;
         this.maxFileSize = cloudConfig.getMaxFileSize();
-        this.allowedMimeTypes = cloudConfig.getAllowedMimeTypes();
     }
 
-    public Optional<String> getUrl(MultipartFile file, String folder) {
-        return Optional.ofNullable(file)
-                .filter(validSize())
-                .filter(validMime())
-                .map(f -> uploadToCloudinary(f, folder));
+    public String upload(byte[] data, String contentType, String resourceType, String folder) {
+        validateFile(data, contentType);
+        return uploadToCloudinary(data, resourceType, folder);
     }
 
     public void deleteFileByUrl(String imageUrl) {
@@ -44,30 +39,23 @@ public class CloudServ {
         }
     }
 
-    private Predicate<MultipartFile> validSize() {
-        return file -> {
-            boolean ok = file.getSize() <= maxFileSize;
-            if (!ok)
-                throw new RuntimeException("❌ File quá lớn: " + file.getSize() + " bytes");
-            return ok;
-        };
+    private void validateFile(byte[] data, String contentType) {
+        if (data == null || data.length == 0) {
+            throw new IllegalArgumentException("File data không được để trống");
+        }
+        if (data.length > maxFileSize) {
+            throw new RuntimeException("❌ File quá lớn: " + data.length + " bytes");
+        }
+
     }
 
-    private Predicate<MultipartFile> validMime() {
-        return file -> {
-
-            boolean ok = allowedMimeTypes.contains(file.getContentType());
-            if (!ok)
-                throw new RuntimeException("❌ MIME type không hợp lệ: ");
-            return ok;
-        };
-    }
-
-    @SuppressWarnings("unchecked")
-    private String uploadToCloudinary(MultipartFile file, String folder) {
+    private String uploadToCloudinary(byte[] data, String resourceType, String folder) {
         try {
-            Map<String, Object> uploadResult = (Map<String, Object>) cloudinary.uploader().upload(file.getBytes(),
-                    ObjectUtils.asMap("resource_type", folder, "folder", folder));
+            Map<String, Object> params = ObjectUtils.asMap(
+                    "resource_type", resourceType,
+                    "overwrite", true,
+                    "folder", folder);
+            Map<String, Object> uploadResult = (Map<String, Object>) cloudinary.uploader().upload(data, params);
             return uploadResult.get("secure_url").toString();
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi tải lên Cloudinary: " + e.getMessage(), e);
@@ -95,5 +83,4 @@ public class CloudServ {
             return null;
         }
     }
-
 }

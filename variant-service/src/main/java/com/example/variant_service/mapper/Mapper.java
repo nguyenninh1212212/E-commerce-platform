@@ -22,7 +22,7 @@ public class Mapper {
     public Variant toEntity(VariantReq variantReq, String productId) {
         return Variant.builder()
                 .productId(productId)
-                .attributes(variantReq.getAttributes()) 
+                .attributes(variantReq.getAttributes())
                 .status(variantReq.getStatus())
                 .price(variantReq.getPrice())
                 .quantity(variantReq.getQuantity())

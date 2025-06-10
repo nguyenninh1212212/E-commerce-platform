@@ -34,5 +34,7 @@ public class VariantBase {
 
     @NotNull(groups = { add.class })
     private List<Attribute> attributes;
+    @NotNull(groups = { add.class })
+    private String sku;
 
 }

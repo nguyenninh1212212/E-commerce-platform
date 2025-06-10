@@ -1,0 +1,44 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "variant";
+
+import "shared/attribute.proto"; 
+
+enum Status {
+  UNKNOWN = 0;
+  SOLD_OUT = 1;
+  IN_STOCK = 2;
+  PRE_ORDER = 3;
+  DISCONTINUED = 4;
+}
+
+message VariantResponse {
+  string id = 1;
+  repeated shared.Attribute attributes = 2; 
+  Status status = 3;
+  double price = 4;
+  int32 quantity = 5;
+}
+
+message GetVariantsRequest {
+  string productId = 1;
+}
+
+message VariantsRequest {
+  string productId = 1;
+  repeated shared.Attribute attributes = 2; 
+  Status status = 3;
+  double price = 4;
+  int32 quantity = 5;
+}
+
+message CreateVariantsRequest {
+  repeated VariantsRequest variants = 1;
+}
+message res{
+  string value  = 1;
+}
+service VariantService {
+  rpc GetVariants(GetVariantsRequest) returns (stream VariantResponse);
+  rpc CreateVariants(CreateVariantsRequest) returns (res);
+}

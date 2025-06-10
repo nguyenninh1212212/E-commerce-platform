@@ -29,5 +29,6 @@ public class Variant {
     private int quantity;
     private Instant createdAt;
     private Instant updatedAt;
+    private String sku;
 
 }
