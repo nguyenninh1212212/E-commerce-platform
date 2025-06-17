@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.product_service.model.dto.req.ProductReq;
 import com.example.product_service.model.dto.req.ProductUpdateReq;
 import com.example.product_service.model.dto.res.ApiRes;
 import com.example.product_service.model.dto.res.Pagination;

@@ -42,4 +42,19 @@ public class ProductCoordinatorServImpl implements ProductCoordinatorService {
                         () -> variantServiceGrpcClient.CreateVariant(productId, reqVariantList), executor));
     }
 
+    @Override
+    public CompletableFuture<String> DeleteProductAndVariantsById(String productId) {
+        CompletableFuture<Void> deleteProduct = CompletableFuture.runAsync(() -> {
+            productServiceGrpcClient.DeleteProduct(productId);
+        });
+        CompletableFuture<Void> deteleVariant = CompletableFuture.runAsync(() -> {
+            variantServiceGrpcClient.DeleteVariant(productId);
+        });
+        return CompletableFuture.allOf(deleteProduct, deteleVariant)
+                .thenApply(v -> "Delete product and variant with ID : " + productId)
+                .exceptionally(ex -> {
+                    return "Failed to delete product and variants: " + ex.getMessage();
+                });
+    }
+
 }

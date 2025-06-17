@@ -6,7 +6,7 @@ spring:
     name: product-service
   data:
     mongodb:
-      uri: mongodb://developer:password123@localhost:27017/productdb?authSource=admin
+      uri: mongodb://developer:password123@mongodb:27017/productdb?authSource=admin
   servlet:
     multipart:
       enabled: true
@@ -24,4 +24,7 @@ grpc:
   client:
     variant-client:
       address: static://localhost:4049
+      negotiationType: PLAINTEXT
+    cloud-client:
+      address: static://localhost:4041
       negotiationType: PLAINTEXT

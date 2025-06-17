@@ -6,16 +6,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.example.product_coordinator_service.model.dto.req.Attribute;
 import com.example.product_coordinator_service.model.dto.req.Variant;
 import com.example.product_coordinator_service.model.enums.Status;
 
+import shared.Message;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import variant.VariantServiceGrpc.VariantServiceBlockingStub;
-import variant.res;
 import variant.CreateVariantsRequest;
+import variant.GetVariantsRequest;
 import variant.VariantsRequest;
 
 @Slf4j
@@ -50,20 +50,28 @@ public class VariantServiceGrpcClient {
                         .collect(Collectors.toList());
                 VariantsRequest req = VariantsRequest.newBuilder()
                         .setPrice(variant.getPrice())
-                        .setProductId(productId)
-                        .setQuantity(variant.getQuantity())
                         .setStatus(toProtoStatus(variant.getStatus()))
                         .addAllAttributes(attributes)
                         .build();
                 reqList.add(req);
             }
             CreateVariantsRequest createVariantsRequest = CreateVariantsRequest.newBuilder().addAllVariants(reqList)
+                    .setProductId(productId)
                     .build();
-            res response = blockingStub.createVariants(createVariantsRequest);
+            Message response = blockingStub.createVariants(createVariantsRequest);
             return response.getValue().toString();
         } catch (Exception e) {
             log.info("CreateVariant", e.getMessage());
             throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void DeleteVariant(String productId) {
+        try {
+            GetVariantsRequest req = GetVariantsRequest.newBuilder().setProductId(productId).build();
+            blockingStub.deleteVariantsByProductId(req);
+        } catch (Exception e) {
+            log.info("Delete variant error : ", e.getMessage());
         }
     }
 }

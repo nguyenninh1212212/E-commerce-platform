@@ -6,6 +6,9 @@ import com.example.variant_service.model.dto.res.VariantRes;
 import com.example.variant_service.service.VariantServ;
 import com.example.variant_service.validation.add;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,13 @@ public class VariantController {
 
     @Autowired
     private VariantServ variantServ;
+
+    @PostMapping("/batch")
+    public void createVariants(
+            @RequestBody @NotEmpty(message = "Danh sách variant không được để trống") List<@Valid VariantReq> variants,
+            @RequestParam("productId") String productId) {
+        variantServ.createVariantList(variants, productId);
+    }
 
     // GET /variants/product/{productId}?attr_key1=value1&attr_key2=value2
     @GetMapping("/product/{productId}")

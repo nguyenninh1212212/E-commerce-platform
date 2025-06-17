@@ -3,6 +3,8 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "cloud";
 
+import "shared/message.proto";
+
 message CloudRequest {
     string assetFolder = 1;
     bytes data = 2;
@@ -12,12 +14,7 @@ message CloudRequest {
 message CloudUrl {
     string url = 1;
 }
-
-message Messages {
-    string value = 1;
-}
-
 service CloudService {
     rpc upload(CloudRequest) returns (CloudUrl);
-    rpc delete(CloudUrl) returns (Messages);
+    rpc delete(CloudUrl) returns (shared.Message);
 }

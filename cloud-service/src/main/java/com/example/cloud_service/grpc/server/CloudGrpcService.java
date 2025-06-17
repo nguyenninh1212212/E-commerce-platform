@@ -28,10 +28,10 @@ public class CloudGrpcService extends CloudServiceGrpc.CloudServiceImplBase {
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.info("upload error : ", e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    
     @Override
     public void delete(cloud.CloudUrl request,
             io.grpc.stub.StreamObserver<cloud.Messages> responseObserver) {
@@ -42,7 +42,6 @@ public class CloudGrpcService extends CloudServiceGrpc.CloudServiceImplBase {
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.info("delete error : ", e.getMessage());
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

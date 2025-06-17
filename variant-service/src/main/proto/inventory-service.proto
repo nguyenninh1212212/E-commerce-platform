@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package inventory;
+
+option java_multiple_files = true;
+option java_package = "inventory";
+
+import "shared/inventory.proto";
+
+message Empty {}
+
+message Message {
+    string value = 1;
+}
+
+message InventoryRequest {
+    string variantId = 1;
+    int32 stockAvailable = 2;
+}
+
+message InventoryRequestList {
+    repeated InventoryRequest requests = 1;
+}
+
+message InventoryResponseList {
+    repeated shared.InventoryResponse responses = 1;
+}
+
+message StockRequest {
+    string variantId = 1;
+    int32 quantity = 2;
+}
+
+message VariantIdRequest {
+    string variantId = 1;
+}
+
+message VariantIdRequestList {
+    repeated VariantIdRequest variantIds = 1;
+}
+
+service InventoryService {
+    rpc createInventory (InventoryRequestList) returns (Message);
+    rpc getInventory (VariantIdRequestList) returns (InventoryResponseList);
+}

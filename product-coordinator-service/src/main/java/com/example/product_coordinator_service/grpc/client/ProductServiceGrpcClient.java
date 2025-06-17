@@ -1,7 +1,6 @@
 package com.example.product_coordinator_service.grpc.client;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +40,13 @@ public class ProductServiceGrpcClient {
                             .build())
                     .collect(Collectors.toList());
 
-            String imgAfterUpload = cloudServiceGrpcClient.getUrl(img);
+            // String imgAfterUpload = cloudServiceGrpcClient.getUrl(img);
 
             ProductRequest reqProto = ProductRequest
                     .newBuilder()
                     .addAllAttributes(attributes)
                     .setSales(req.getSales())
-                    .setImg(imgAfterUpload)
+                    .setImg("imgAfterUpload")
                     .setCategory(
                             Category.newBuilder()
                                     .setId(req.getTags().getId())
@@ -63,5 +62,17 @@ public class ProductServiceGrpcClient {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public void DeleteProduct(String productId) {
+        try {
+            ProductId req = ProductId.newBuilder().setId(productId).build();
+            blockingStub.deleteProduct(req);
+        } catch (Exception e) {
+            log.info("Loi khi xoa product : ", e.getMessage());
+            throw new RuntimeException(e.getMessage());
+
+        }
+
     }
 }

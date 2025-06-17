@@ -1,5 +1,7 @@
 package com.example.variant_service.grpc.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +11,23 @@ import com.example.variant_service.model.dto.res.VariantRes;
 import com.example.variant_service.model.enums.Status;
 import com.example.variant_service.service.VariantServ;
 
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import variant.VariantServiceGrpc;
-import variant.res;
 import variant.GetVariantsRequest;
 import variant.VariantResponse;
 import variant.Attribute;
 import variant.CreateVariantsRequest;
+import variant.Message; // Renamed from 'res' in proto to match Java naming convention
 
+@Slf4j
 @GrpcService
 public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
+
     @Autowired
     private VariantServ variantServ;
 
-    private static variant.Status toProtoStatus(com.example.variant_service.model.enums.Status status) {
+    private static variant.Status toProtoStatus(Status status) {
         if (status == null)
             return variant.Status.UNKNOWN;
         return switch (status) {
@@ -44,32 +49,29 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
         };
     }
 
+    @Override
     public void getVariants(GetVariantsRequest request, io.grpc.stub.StreamObserver<VariantResponse> responseObserver) {
         try {
-            java.util.List<VariantRes> variantList = variantServ.findByProductId(request.getProductId());
-
+            var variantList = variantServ.findByProductId(request.getProductId());
             for (VariantRes variant : variantList) {
                 VariantResponse.Builder builder = VariantResponse.newBuilder()
                         .setId(variant.getId())
                         .setPrice(variant.getPrice())
                         .setSku(variant.getSku())
-                        .setQuantity(variant.getQuantity())
-                        .setStatus(toProtoStatus(variant.getStatus()));
-                builder.addAllAttributes(
-                        variant.getAttributes().stream()
-                                .map(attr -> Attribute.newBuilder()
-                                        .setName(attr.getName())
-                                        .addAllValues(attr.getValues())
-                                        .build())
-                                .collect(Collectors.toList()));
+                        .setStatus(toProtoStatus(variant.getStatus()))
+                        .addAllAttributes(
+                                variant.getAttributes().stream()
+                                        .map(attr -> Attribute.newBuilder()
+                                                .setName(attr.getName())
+                                                .addAllValues(attr.getValues())
+                                                .build())
+                                        .collect(Collectors.toList()));
 
                 responseObserver.onNext(builder.build());
-
             }
-
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error in getVariants: {}", e.getMessage(), e);
             responseObserver.onError(io.grpc.Status.INTERNAL
                     .withDescription("Lỗi server khi xử lý Variant: " + e.getMessage())
                     .withCause(e)
@@ -78,32 +80,46 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
     }
 
     @Override
-    public void createVariants(CreateVariantsRequest request, io.grpc.stub.StreamObserver<res> responseObserver) {
+    public void createVariants(CreateVariantsRequest request, io.grpc.stub.StreamObserver<Message> responseObserver) {
         try {
+            List<VariantReq> variantList = new ArrayList<>();
             request.getVariantsList().forEach(variantReq -> {
-                VariantReq variant = VariantReq.builder()
-                        .price(variantReq.getPrice())
-                        .quantity(variantReq.getQuantity())
-                        .status(toStatus(variantReq.getStatus()))
-                        .sku(variantReq.getSku())
-                        .attributes(variantReq.getAttributesList().stream()
-                                .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
-                                        attr.getValuesList()))
-                                .collect(Collectors.toList()))
-
-                        .build();
-
-                variantServ.createVariant(variant, variantReq.getProductId());
+                variantList.add(
+                        VariantReq.builder()
+                                .price(variantReq.getPrice())
+                                .status(toStatus(variantReq.getStatus()))
+                                .sku(variantReq.getSku())
+                                .attributes(variantReq.getAttributesList().stream()
+                                        .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
+                                                attr.getValuesList()))
+                                        .collect(Collectors.toList()))
+                                .build());
             });
-            res response = res.newBuilder()
-                    .setValue("Variants created successfully")
-                    .build();
+            variantServ.createVariantList(variantList, request.getProductId());
+            Message response = Message.newBuilder().setValue("Variants created successfully").build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error in createVariants: {}", e.getMessage(), e);
             responseObserver.onError(io.grpc.Status.INTERNAL
                     .withDescription("Lỗi server khi tạo Variant: " + e.getMessage())
+                    .withCause(e)
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void deleteVariantsByProductId(GetVariantsRequest request,
+            io.grpc.stub.StreamObserver<Message> responseObserver) {
+        try {
+            variantServ.deleteVariantsByProductId(request.getProductId());
+            Message response = Message.newBuilder().setValue("Variants deleted successfully").build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Error in deleteVariantsByProductId: {}", e.getMessage(), e);
+            responseObserver.onError(io.grpc.Status.INTERNAL
+                    .withDescription("Lỗi server khi xóa Variant: " + e.getMessage())
                     .withCause(e)
                     .asRuntimeException());
         }

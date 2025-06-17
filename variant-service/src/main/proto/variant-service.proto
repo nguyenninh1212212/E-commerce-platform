@@ -1,8 +1,11 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "variant"; // Java package nên đặt theo chuẩn
+package variant;
 
+option java_multiple_files = true;
+option java_package = "variant";
+
+import "shared/inventory.proto";
 
 enum Status {
   UNKNOWN = 0;
@@ -21,31 +24,33 @@ message VariantResponse {
   string id = 1;
   repeated Attribute attributes = 2;
   Status status = 3;
+  shared.InventoryResponse inventory = 4;
   double price = 5;
-  int32 quantity = 6;
-  string sku = 7;
+  string sku = 6;
 }
 
 message GetVariantsRequest {
   string productId = 1;
 }
+
 message VariantsRequest {
-  string productId = 1;
-  repeated Attribute attributes = 2;
-  Status status = 3;
-  double price = 5;
-  int32 quantity = 6;
-  string sku = 7;
+  repeated Attribute attributes = 1;
+  Status status = 2;
+  double price = 3;
+  string sku = 4;
 }
 
 message CreateVariantsRequest {
-  repeated VariantsRequest variants = 1;
+  string productId = 1;
+  repeated VariantsRequest variants = 2;
 }
 
-message res{
-  string value  = 1;
+message Message {
+  string value = 1;
 }
+
 service VariantService {
   rpc GetVariants(GetVariantsRequest) returns (stream VariantResponse);
-  rpc CreateVariants(CreateVariantsRequest) returns (res);
+  rpc CreateVariants(CreateVariantsRequest) returns (Message);
+  rpc DeleteVariantsByProductId(GetVariantsRequest) returns (Message);
 }

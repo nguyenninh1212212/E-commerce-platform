@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package shared;
+
+option java_multiple_files = true;
+option java_package = "shared";
+
+message InventoryResponse {
+    string id = 1;
+    string variantId = 2;
+    int32 stockTotal = 3;
+    int32 stockReserved = 4;
+    int32 stockAvailable = 5;
+    int32 lowStockThreshold = 6;
+    string lastUpdatedAt = 7;
+}

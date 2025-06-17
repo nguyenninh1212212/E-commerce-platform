@@ -24,7 +24,10 @@ message ProductRequest {
 message ProductId {
   string id = 1;
 }
+message Empty {
+}
 
 service ProductService {
   rpc CreateProduct(ProductRequest) returns (ProductId);
+  rpc DeleteProduct(ProductId) returns (Empty);
 }

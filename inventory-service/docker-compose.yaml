@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  inventory-service:
+    build: .
+    image: inventory-service:latest
+    container_name: inventory-service
+    ports: 
+      - "8090:8090"
+      - "4050:4050" 
+    networks:
+      - E_COMMERCE_PLATFORM-net
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true      

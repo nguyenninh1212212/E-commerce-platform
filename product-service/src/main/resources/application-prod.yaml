@@ -6,11 +6,11 @@ spring:
     mongodb:
       uri: ${MONGO_URI} # đọc từ biến môi trường hoặc Vault
 
-  kafka:
-    bootstrap-servers: ${KAFKA_SERVERS}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  # kafka:
+  #   bootstrap-servers: ${KAFKA_SERVERS}
+  #   producer:
+  #     key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  #     value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
 grpc:
   client:

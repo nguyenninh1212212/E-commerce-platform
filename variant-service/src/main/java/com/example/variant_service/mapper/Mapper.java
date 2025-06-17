@@ -14,8 +14,8 @@ public class Mapper {
                 .productId(variant.getProductId())
                 .attributes(variant.getAttributes())
                 .status(variant.getStatus())
+                .sku(variant.getSku())
                 .price(variant.getPrice())
-                .quantity(variant.getQuantity())
                 .build();
     }
 
@@ -25,7 +25,7 @@ public class Mapper {
                 .attributes(variantReq.getAttributes())
                 .status(variantReq.getStatus())
                 .price(variantReq.getPrice())
-                .quantity(variantReq.getQuantity())
+                .sku(variantReq.getSku())
                 .build();
     }
 }

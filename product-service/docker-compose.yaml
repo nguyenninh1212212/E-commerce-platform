@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  product-service:
+    build: .
+    image: product-service:latest
+    container_name: product-service
+    ports:
+      - "8083:8083"
+      - "4043:4043"
+    networks:
+      - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true # Docker Compose sẽ không tạo mới mạng này, mà sẽ xài lại một cái mạng đã được tạo từ trước ở ngoài (bên ngoài file docker-compose.yml).

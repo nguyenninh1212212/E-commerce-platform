@@ -11,4 +11,6 @@ import com.example.product_coordinator_service.model.dto.req.Variant;
 public interface ProductCoordinatorService {
     CompletableFuture<String> CreateProductAndVariants(Product reqProduct, List<Variant> reqVariantList,
             MultipartFile file);
+
+    CompletableFuture<String> DeleteProductAndVariantsById(String productId);
 }

@@ -10,6 +10,8 @@ services:
       - "4049:4049" 
     networks:
       - E_COMMERCE_PLATFORM-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker  
 networks:
   E_COMMERCE_PLATFORM-net:
     external: true      

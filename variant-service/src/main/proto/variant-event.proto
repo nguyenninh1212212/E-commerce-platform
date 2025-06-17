@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package variant.event;
+
+option java_multiple_files = true;
+
+message VariantEvent{
+    string variantId = 1;
+    int32 quantity = 2;
+    string eventType= 3;
+}
+
+message VariantEventList{
+    repeated VariantEvent variantEvent = 1;
+}

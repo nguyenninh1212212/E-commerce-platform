@@ -26,7 +26,6 @@ public class Variant {
     private List<Attribute> attributes;
     private Status status;
     private Double price;
-    private int quantity;
     private Instant createdAt;
     private Instant updatedAt;
     private String sku;

@@ -7,32 +7,31 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.example.product_service.grpc.client.CloudServiceGrpcClient;
 import com.example.product_service.grpc.client.VariantServiceGrpcClient;
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Variants;
 import com.example.product_service.model.dto.req.ProductReq;
-import com.example.product_service.model.dto.req.ProductUpdateReq;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.VariantsStatus;
 import com.example.product_service.service.ProductService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import variant.VariantResponse;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServImpl implements ProductService {
         private final MongoTemplate mongoTemplate;
         private final VariantServiceGrpcClient variantServiceGrpcClient;
+        private final CloudServiceGrpcClient cloudServiceGrpcClient;
 
         @Override
         public String addProduct(ProductReq req, String img) {
@@ -135,13 +134,18 @@ public class ProductServImpl implements ProductService {
         }
 
         @Override
-
         public void deleteProductById(String id) {
                 Product product = mongoTemplate.findById(id, Product.class);
                 if (product == null) {
                         throw new IllegalArgumentException("Product not found with id: " + id);
                 }
+                try {
+                        cloudServiceGrpcClient.deleteImg(product.getImageUrl().get(0));
+                } catch (Exception e) {
+                        log.info("delete product fail : ", e.getMessage());
+                }
                 mongoTemplate.remove(product);
+
         }
 
 }

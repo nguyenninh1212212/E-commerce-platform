@@ -1,6 +1,7 @@
 package com.example.product_coordinator_service.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +26,22 @@ public class ProductCoordinatorController {
     private final ProductCoordinatorService coordinatorService;
 
     @PostMapping("/cre")
-    public ResponseEntity<?> createProductAndVariant(
+    public ResponseEntity<String> createProductAndVariant(
             @RequestPart Product product,
             @RequestPart List<Variant> variant,
             @RequestPart MultipartFile file
 
     ) throws InterruptedException, ExecutionException {
         CompletableFuture<String> future = coordinatorService.CreateProductAndVariants(product, variant, file);
+        return ResponseEntity.ok(future.get().toString());
+    }
+
+    @PostMapping("/del")
+    public ResponseEntity<String> deleteProductAndVariant(
+            @RequestParam String product
+
+    ) throws InterruptedException, ExecutionException {
+        CompletableFuture<String> future = coordinatorService.DeleteProductAndVariantsById(product);
         return ResponseEntity.ok(future.get().toString());
     }
 

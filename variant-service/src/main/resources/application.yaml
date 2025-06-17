@@ -1,12 +1,18 @@
 spring:
   application:
     name: variant-service
-  data:
-    mongodb:
-      uri: mongodb://developer:password123@localhost:27017/variantdb?authSource=admin
-grpc:
-  server:
-    port: 4049
 
 server:
   port: 8089
+
+logging:
+  level:
+    root: error
+
+grpc:
+  server:
+    port: 4049
+  client:
+    inventory-client:
+      address: static://localhost:4050
+      negotiationType: PLAINTEXT

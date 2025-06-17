@@ -14,7 +14,11 @@ public interface VariantServ {
 
     void createVariant(VariantReq variant, String productId);
 
+    void createVariantList(List<VariantReq> variant, String productId);
+
     void deleteVariant(String id, String productId);
 
     void updateVariantPartial(VariantReq req, String id, String productId);
+
+    void deleteVariantsByProductId(String productId);
 }

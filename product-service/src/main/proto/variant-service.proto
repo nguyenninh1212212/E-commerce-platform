@@ -25,15 +25,15 @@ message GetVariantsRequest {
 }
 
 message VariantsRequest {
-  string productId = 1;
-  repeated shared.Attribute attributes = 2; 
-  Status status = 3;
-  double price = 4;
-  int32 quantity = 5;
+  repeated shared.Attribute attributes = 1;
+  Status status = 2;
+  double price = 3;
+  string sku = 4;
 }
 
 message CreateVariantsRequest {
-  repeated VariantsRequest variants = 1;
+  string productId = 1;
+  repeated VariantsRequest variants = 2;
 }
 
 service VariantService {

@@ -43,4 +43,12 @@ public class ProductGrpcService extends ProductServiceGrpc.ProductServiceImplBas
                 responseObserver.onNext(id);
                 responseObserver.onCompleted();
         }
+
+        @Override
+        public void deleteProduct(product.ProductId request,
+                        io.grpc.stub.StreamObserver<product.Empty> responseObserver) {
+                productService.deleteProductById(request.getId());
+                responseObserver.onNext(product.Empty.newBuilder().build());
+                responseObserver.onCompleted();
+        }
 }
