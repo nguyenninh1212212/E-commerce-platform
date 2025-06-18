@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile:
+        - docker
+
+cloudinary:
+  apiKey: ${API_CLOUD_KEY}
+  apiSecret: ${API_CLOUD_SECRET}
+  cloudName: ${API_CLOUD_NAME}
+  maxFileSize: ${MAX_FILE_SIZE}
+  allowedMimeTypes:
+    - image/png
+    - image/jpeg
+    - image/jpg

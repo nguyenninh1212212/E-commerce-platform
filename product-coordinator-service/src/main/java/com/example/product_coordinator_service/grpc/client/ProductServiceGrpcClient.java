@@ -28,7 +28,7 @@ public class ProductServiceGrpcClient {
     @Autowired
     private CloudServiceGrpcClient cloudServiceGrpcClient;
 
-    public String CreateProduct(Product req, byte[] img) {
+    public String CreateProduct(Product req, List<byte[]> img) {
         try {
 
             List<Attribute> attributes = req.getAttributes()
@@ -40,13 +40,13 @@ public class ProductServiceGrpcClient {
                             .build())
                     .collect(Collectors.toList());
 
-            // String imgAfterUpload = cloudServiceGrpcClient.getUrl(img);
+            List<String> imgAfterUpload = cloudServiceGrpcClient.getUrls(img);
 
             ProductRequest reqProto = ProductRequest
                     .newBuilder()
                     .addAllAttributes(attributes)
                     .setSales(req.getSales())
-                    .setImg("imgAfterUpload")
+                    .addAllImg(imgAfterUpload)
                     .setCategory(
                             Category.newBuilder()
                                     .setId(req.getTags().getId())

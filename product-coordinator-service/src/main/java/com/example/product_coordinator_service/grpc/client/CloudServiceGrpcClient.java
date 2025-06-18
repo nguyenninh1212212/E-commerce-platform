@@ -1,10 +1,14 @@
 package com.example.product_coordinator_service.grpc.client;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import cloud.CloudRequest;
+import cloud.CloudRequests;
 import cloud.CloudUrl;
+import cloud.CloudUrls;
 import cloud.CloudServiceGrpc.CloudServiceBlockingStub;
 import com.google.protobuf.ByteString;
 import lombok.NoArgsConstructor;
@@ -39,4 +43,30 @@ public class CloudServiceGrpcClient {
             return null;
         }
     }
+
+    public List<String> getUrls(List<byte[]> fileBytes) {
+        if (fileBytes == null || fileBytes.isEmpty()) {
+            throw new IllegalArgumentException("❌ Danh sách file rỗng, không thể upload");
+        }
+
+        try {
+            List<ByteString> byteStrings = fileBytes.stream()
+                    .map(ByteString::copyFrom)
+                    .toList();
+
+            CloudRequests request = CloudRequests.newBuilder()
+                    .setAssetFolder(assetFolder)
+                    .setResourceType(resourceFile)
+                    .addAllDatas(byteStrings)
+                    .build();
+
+            CloudUrls response = blockingStub.uploads(request);
+            return response.getUrlList();
+
+        } catch (Exception ex) {
+            log.error("❌ Lỗi khi gọi gRPC Cloud service để upload ảnh: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Lỗi khi upload ảnh lên Cloud", ex);
+        }
+    }
+
 }

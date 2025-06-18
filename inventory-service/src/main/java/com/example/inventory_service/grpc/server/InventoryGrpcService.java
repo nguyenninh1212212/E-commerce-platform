@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
 import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.service.InventoryService;
 
@@ -32,12 +33,12 @@ public class InventoryGrpcService extends InventoryServiceImplBase {
     @Override
     public void createInventory(inventory.InventoryRequestList request,
             io.grpc.stub.StreamObserver<inventory.Message> responseObserver) {
-        List<InventoryReq> reqList = new ArrayList<>();
+        List<VariantCreatedEvent> reqList = new ArrayList<>();
         for (InventoryRequest reqProto : request.getRequestsList()) {
             try {
-                InventoryReq req = InventoryReq
+                VariantCreatedEvent req = VariantCreatedEvent
                         .builder()
-                        .stockAvailable(reqProto.getStockAvailable())
+                        .quantity(reqProto.getStockAvailable())
                         .variantId(reqProto.getVariantId())
                         .build();
                 reqList.add(req);

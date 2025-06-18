@@ -75,4 +75,10 @@ public class VariantController {
         variantServ.deleteVariant(id, productId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteVariantByProduct(@PathVariable String productId) {
+        variantServ.deleteVariantsByProductId(productId);
+        return ResponseEntity.noContent().build();
+    }
 }

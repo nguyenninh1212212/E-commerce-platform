@@ -16,7 +16,7 @@ import variant.event.VariantEventList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class VariantProducer {
+public class KafkaProducerVariant {
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
 
     public void sendEvent(List<VariantCreatedEvent> createdEvents) {
@@ -40,7 +40,8 @@ public class VariantProducer {
                 .build();
 
         try {
-            kafkaTemplate.send("inventory", variantEventList.toByteArray());
+            String key = createdEvents.get(0).getVariantId(); 
+            kafkaTemplate.send("inventory", key, variantEventList.toByteArray());
             log.info("Sending event to Kafka with {} variants", variantEventArrList.size());
         } catch (Exception e) {
             log.error("Error send event InventoryCreateEvent : {}", e);

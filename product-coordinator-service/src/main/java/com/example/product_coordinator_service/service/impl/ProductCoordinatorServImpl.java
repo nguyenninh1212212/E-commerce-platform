@@ -1,5 +1,6 @@
 package com.example.product_coordinator_service.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -27,17 +28,20 @@ public class ProductCoordinatorServImpl implements ProductCoordinatorService {
 
     @Override
     public CompletableFuture<String> CreateProductAndVariants(Product reqProduct, List<Variant> reqVariantList,
-            MultipartFile file) {
-
+            MultipartFile[] file) {
+        List<byte[]> fileBytes = new ArrayList<>();
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return file.getBytes();
+                for (byte[] filebyte : fileBytes) {
+                    fileBytes.add(filebyte);
+                }
+                return fileBytes;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }, executor)
-                .thenCompose(fileBytes -> CompletableFuture
-                        .supplyAsync(() -> productServiceGrpcClient.CreateProduct(reqProduct, fileBytes), executor))
+                .thenCompose(bytes -> CompletableFuture
+                        .supplyAsync(() -> productServiceGrpcClient.CreateProduct(reqProduct, bytes), executor))
                 .thenCompose(productId -> CompletableFuture.supplyAsync(
                         () -> variantServiceGrpcClient.CreateVariant(productId, reqVariantList), executor));
     }

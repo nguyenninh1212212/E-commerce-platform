@@ -1,5 +1,6 @@
 package com.example.inventory_service.controller;
 
+import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
 import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.service.InventoryService;
 
@@ -24,7 +25,7 @@ public class InventoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createInventory(@RequestBody List<InventoryReq> req) {
+    public ResponseEntity<?> createInventory(@RequestBody List<VariantCreatedEvent> req) {
         inventoryService.createInventory(req);
         return ResponseEntity.ok("Inventory created successfully");
     }

@@ -9,6 +9,8 @@ logging:
   level:
     root: error
 
+debug: true
+
 grpc:
   server:
     port: 4049

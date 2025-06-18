@@ -29,7 +29,7 @@ public class ProductCoordinatorController {
     public ResponseEntity<String> createProductAndVariant(
             @RequestPart Product product,
             @RequestPart List<Variant> variant,
-            @RequestPart MultipartFile file
+            @RequestPart MultipartFile[] file
 
     ) throws InterruptedException, ExecutionException {
         CompletableFuture<String> future = coordinatorService.CreateProductAndVariants(product, variant, file);

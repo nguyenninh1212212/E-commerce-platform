@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,9 +22,8 @@ import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.res.VariantRes;
 import com.example.variant_service.model.entity.Variant;
 import com.example.variant_service.service.VariantServ;
-import com.example.variant_service.service.kafka.VariantProducer;
 import com.mongodb.client.result.UpdateResult;
-
+import com.example.variant_service.service.kafka.KafkaProducerVariant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class VariantServImpl implements VariantServ {
     private final MongoTemplate mongoTemplate;
-    private final VariantProducer variantProducer;
+    private final KafkaProducerVariant kafkaProducer;
 
     public List<VariantRes> findByProductIdWithAttributes(String productId, Map<String, Object> attrs) {
         Query query = new Query();
@@ -90,7 +88,7 @@ public class VariantServImpl implements VariantServ {
 
             createdEvents.add(variantCreatedEvent);
         }
-        variantProducer.sendEvent(createdEvents);
+        kafkaProducer.sendEvent(createdEvents);
     }
 
     public void updateVariantPartial(VariantReq req, String id, String productId) {

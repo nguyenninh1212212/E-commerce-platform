@@ -12,9 +12,9 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       ALLOWED_MIME_TYPES: image/png,image/jpeg,image/jpg
       MAX_FILE_SIZE: 55242880
-      API_CLOUD_KEY: ${API_CLOUD_KEY}
-      API_CLOUD_SECRET: ${API_CLOUD_SECRET}
-      API_CLOUD_NAME: ${API_CLOUD_NAME}
+      API_CLOUD_KEY: 863938529749295
+      API_CLOUD_SECRET: ezwBvkmvEwE7ZzquiJ35gNQW2PU
+      API_CLOUD_NAME: dxpyuj1mm
     networks:
       - E_COMMERCE_PLATFORM-net
 

@@ -1,5 +1,5 @@
 Kết luận:
-⏳ 7.76s là chậm. Tối ưu ngay mảng upload Cloudinary + async variant là cách bạn cần làm sớm.
+⏳ 7.76s là chậm. Tối ưu ngay mảng upload Cloudinary + async variant là cách bạn cần làm sớm. V
 
 -variant-service inventory-service
 cần kafka để lưu inventory lưu id của variant và quantity

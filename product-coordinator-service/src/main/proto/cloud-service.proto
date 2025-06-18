@@ -14,7 +14,22 @@ message CloudRequest {
 message CloudUrl {
     string url = 1;
 }
+
+
+message CloudRequests {
+    string assetFolder = 1;
+    string resourceType = 2; 
+    repeated bytes datas = 3;
+
+}
+
+message CloudUrls {
+    repeated string url = 1;
+}
+
+
 service CloudService {
     rpc upload(CloudRequest) returns (CloudUrl);
+    rpc uploads(CloudRequests) returns (CloudUrls);
     rpc delete(CloudUrl) returns (shared.Message);
 }

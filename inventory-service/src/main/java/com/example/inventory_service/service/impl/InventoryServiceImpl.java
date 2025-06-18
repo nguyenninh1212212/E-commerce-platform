@@ -12,6 +12,7 @@ import com.example.inventory_service.Mapper.ToModel;
 import com.example.inventory_service.excep.extd.AlreadyExistsException;
 import com.example.inventory_service.excep.extd.NotFoundException;
 import com.example.inventory_service.excep.extd.OutOfStockException;
+import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
 import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.model.dto.res.InventoryRes;
 import com.example.inventory_service.model.entity.Inventory;
@@ -31,8 +32,8 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void createInventory(List<InventoryReq> reqList) {
-        for (InventoryReq req : reqList) {
+    public void createInventory(List<VariantCreatedEvent> reqList) {
+        for (VariantCreatedEvent req : reqList) {
             Optional<Inventory> exist = repo.findByVariantId(req.getVariantId());
             if (exist.isPresent()) {
                 throw new AlreadyExistsException(req.getVariantId());
@@ -41,7 +42,7 @@ public class InventoryServiceImpl implements InventoryService {
                     .lastUpdateAt(Instant.now())
                     .variantId(req.getVariantId())
                     .lowStockThresold(lowStockThresold)
-                    .stockAvaiable(req.getStockAvailable())
+                    .stockAvaiable(req.getQuantity())
                     .stockReversed(0)
                     .build();
             repo.save(inventory);

@@ -1,7 +1,10 @@
 package com.example.cloud_service.cloud;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -22,9 +25,18 @@ public class CloudServ {
         this.maxFileSize = cloudConfig.getMaxFileSize();
     }
 
-    public String upload(byte[] data, String contentType, String resourceType, String folder) {
-        validateFile(data, contentType);
+    public String upload(byte[] data, String resourceType, String folder) {
+        validateFile(data, resourceType);
         return uploadToCloudinary(data, resourceType, folder);
+    }
+
+    public List<String> uploads(List<byte[]> datas, String type, String asset_folder) {
+        return datas.stream()
+                .map(data -> {
+                    return uploadToCloudinary(data, type, asset_folder);
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public void deleteFileByUrl(String imageUrl) {
@@ -83,4 +95,5 @@ public class CloudServ {
             return null;
         }
     }
+
 }
