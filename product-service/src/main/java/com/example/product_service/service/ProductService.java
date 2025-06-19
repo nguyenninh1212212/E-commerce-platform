@@ -2,16 +2,13 @@ package com.example.product_service.service;
 
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.example.product_service.model.dto.req.ProductReq;
-import com.example.product_service.model.dto.req.ProductUpdateReq;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 
 public interface ProductService {
-    String addProduct(ProductReq req, String img);
+    String addProduct(ProductReq req, List<String> img);
 
     ProductRes getProductById(String id);
 

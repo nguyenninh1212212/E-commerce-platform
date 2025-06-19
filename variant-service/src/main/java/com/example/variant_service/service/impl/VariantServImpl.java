@@ -4,22 +4,24 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
-import com.example.variant_service.mapper.Mapper;
+import com.example.variant_service.grpc.client.InventoryGrpcClient;
+import com.example.variant_service.mapper.ToModel;
 import com.example.variant_service.model.dto.event.VariantCreatedEvent;
 import com.example.variant_service.model.dto.req.VariantReq;
-import com.example.variant_service.model.dto.res.VariantRes;
+import com.example.variant_service.model.dto.res.InventoryUserRes;
+import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.model.entity.Variant;
 import com.example.variant_service.service.VariantServ;
 import com.mongodb.client.result.UpdateResult;
@@ -34,34 +36,28 @@ import lombok.extern.slf4j.Slf4j;
 public class VariantServImpl implements VariantServ {
     private final MongoTemplate mongoTemplate;
     private final KafkaProducerVariant kafkaProducer;
+    private final InventoryGrpcClient inventoryGrpcClient;
 
-    public List<VariantRes> findByProductIdWithAttributes(String productId, Map<String, Object> attrs) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("productId").is(productId));
-        if (attrs != null) {
-            attrs.forEach((k, v) -> {
-                query.addCriteria(Criteria.where("variantAttributes." + k).is(v));
-            });
-        }
-        List<Variant> variants = mongoTemplate.find(query, Variant.class);
-        return variants.stream()
-                .map(Mapper::toDto)
-                .toList();
-    }
-
-    public List<VariantRes> findByProductId(String productId) {
+    public List<VariantUserRes> findByProductId(String productId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("productId").is(productId));
         List<Variant> variants = mongoTemplate.find(query, Variant.class);
-        return variants.stream()
-                .map(Mapper::toDto)
-                .toList();
-    }
+        List<String> variantIds = variants.stream().map(Variant::getId).toList();
+        List<InventoryUserRes> inventoryUserReses = inventoryGrpcClient.getUserInventorys(variantIds);
+        log.info("inventoryUserReses : ", inventoryUserReses);
+        Map<String, InventoryUserRes> inventoryMap = inventoryUserReses.stream()
+                .collect(Collectors.toMap(InventoryUserRes::getVariantId, Function.identity()));
 
-    @Override
-    public void createVariant(VariantReq variant, String productId) {
-        Variant variants = Mapper.toEntity(variant, productId);
-        mongoTemplate.save(variants);
+        return variants.stream()
+                .map(variant -> {
+                    InventoryUserRes inventory = Optional.ofNullable(inventoryMap.get(variant.getId()))
+                            .orElseThrow(
+                                    () -> new RuntimeException("Inventory missing for variantId: " + variant.getId()));
+
+                    return ToModel.toUserResDto(variant, inventory);
+                })
+                .collect(Collectors.toList());
+
     }
 
     @Override
@@ -70,7 +66,7 @@ public class VariantServImpl implements VariantServ {
         List<Integer> quantities = new ArrayList<>();
         List<VariantCreatedEvent> createdEvents = new ArrayList<>();
         for (VariantReq variantReq : variants) {
-            Variant variant = Mapper.toEntity(variantReq, productId);
+            Variant variant = ToModel.toEntity(variantReq, productId);
             variantList.add(variant);
             quantities.add(variantReq.getQuantity());
         }

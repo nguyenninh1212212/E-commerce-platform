@@ -39,7 +39,18 @@ message VariantIdRequestList {
     repeated VariantIdRequest variantIds = 1;
 }
 
+message InventoryUserView {
+    string variantId = 1;
+    int32 stockReserved = 2;     
+    int32 stockAvailable = 3;  
+}
+
+message InventoryUserViewList {
+    repeated InventoryUserView views = 1;
+}
+
+
 service InventoryService {
-    rpc createInventory (InventoryRequestList) returns (Message);
     rpc getInventory (VariantIdRequestList) returns (InventoryResponseList);
+    rpc getUserInventory (VariantIdRequestList) returns (InventoryUserViewList);
 }

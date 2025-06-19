@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.res.VariantRes;
+import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.model.enums.Status;
 import com.example.variant_service.service.VariantServ;
 
@@ -52,8 +53,8 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
     @Override
     public void getVariants(GetVariantsRequest request, io.grpc.stub.StreamObserver<VariantResponse> responseObserver) {
         try {
-            var variantList = variantServ.findByProductId(request.getProductId());
-            for (VariantRes variant : variantList) {
+            List<VariantUserRes> variantList = variantServ.findByProductId(request.getProductId());
+            for (VariantUserRes variant : variantList) {
                 VariantResponse.Builder builder = VariantResponse.newBuilder()
                         .setId(variant.getId())
                         .setPrice(variant.getPrice())

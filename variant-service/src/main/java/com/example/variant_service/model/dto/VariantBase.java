@@ -26,14 +26,11 @@ public class VariantBase {
     private Double price;
 
     @NotNull(groups = { add.class })
-    @Min(value = 0, groups = { add.class })
-    private Integer quantity;
-
-    @NotNull(groups = { add.class })
     private Status status;
 
     @NotNull(groups = { add.class })
     private List<Attribute> attributes;
+
     @NotNull(groups = { add.class })
     private String sku;
 

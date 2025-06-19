@@ -1,9 +1,10 @@
 package com.example.inventory_service.service.impl;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.example.inventory_service.excep.extd.OutOfStockException;
 import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
 import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.model.dto.res.InventoryRes;
+import com.example.inventory_service.model.dto.res.InventoryUserRes;
 import com.example.inventory_service.model.entity.Inventory;
 import com.example.inventory_service.repos.InventoryRepo;
 import com.example.inventory_service.service.InventoryService;
@@ -29,6 +31,14 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepo repo;
     @Value("${limit.lowStockThresold}")
     private int lowStockThresold;
+
+    private <R> List<R> getInventory(List<String> variantIds, Function<Inventory, R> mapper) {
+        return variantIds.stream()
+                .map(repo::findByVariantId)
+                .flatMap(Optional::stream)
+                .map(mapper)
+                .collect(Collectors.toList());
+    }
 
     @Override
     @Transactional
@@ -92,15 +102,14 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<InventoryRes> getInventory(List<String> variantIds) {
-        List<InventoryRes> inventoryResList = new ArrayList<>();
-        for (String variantId : variantIds) {
-            repo.findByVariantId(variantId).ifPresent(iv -> {
-                inventoryResList.add(ToModel.toRes(iv));
-            });
-            ;
-        }
-        return inventoryResList;
+    public List<InventoryRes> getAllInventory(List<String> variantIds) {
+        return getInventory(variantIds, ToModel::toRes);
+    }
+
+    @Override
+    public List<InventoryUserRes> getUserInventory(List<String> variantIds) {
+        return getInventory(variantIds, ToModel::toUserViewRes);
+
     }
 
 }

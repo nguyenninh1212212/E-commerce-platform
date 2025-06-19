@@ -5,6 +5,10 @@ services:
     build: .
     image: product-service:latest
     container_name: product-service
+    environment:
+      - SPRING_ACTIVE_PROFILE=docker
+      - MONGO_URI=mongodb://developer:password123@mongodb:27017/productdb?authSource=admin
+      - KAFKA_URI=kafka:9092
     ports:
       - "8083:8083"
       - "4043:4043"

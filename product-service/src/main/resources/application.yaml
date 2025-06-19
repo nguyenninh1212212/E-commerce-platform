@@ -4,20 +4,11 @@ server:
 spring:
   application:
     name: product-service
-  data:
-    mongodb:
-      uri: mongodb://developer:password123@mongodb:27017/productdb?authSource=admin
   servlet:
     multipart:
       enabled: true
       strict-servlet-compliance: true
-  # kafka:
-  #   producer:
-  #     key-serializer: org.apache.kafka.common.serialization.SpringSerializer
-  #     value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-  #   bootstrap-servers:
-  #     - localhost:29092
-
+      
 grpc:
   server:
     port: 4043

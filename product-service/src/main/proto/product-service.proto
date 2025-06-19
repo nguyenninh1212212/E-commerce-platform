@@ -17,13 +17,14 @@ message ProductRequest {
   double price = 5;
   string sellerId = 6;
   Category category = 7;
-  string img = 8;
+  repeated string img = 8;
   repeated shared.Attribute attributes = 9; 
 }
 
 message ProductId {
   string id = 1;
 }
+
 message Empty {
 }
 

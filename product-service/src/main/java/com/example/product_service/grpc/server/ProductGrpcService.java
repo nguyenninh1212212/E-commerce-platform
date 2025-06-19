@@ -38,7 +38,7 @@ public class ProductGrpcService extends ProductServiceGrpc.ProductServiceImplBas
                                 .attributes(attributes)
                                 .tags(tags)
                                 .build();
-                String productId = productService.addProduct(req, request.getImg());
+                String productId = productService.addProduct(req, request.getImgList());
                 product.ProductId id = ProductId.newBuilder().setId(productId).build();
                 responseObserver.onNext(id);
                 responseObserver.onCompleted();

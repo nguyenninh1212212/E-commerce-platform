@@ -18,10 +18,14 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<?> getInventory(@RequestParam List<String> variantId) {
+        return ResponseEntity.ok(inventoryService.getAllInventory(variantId));
+    }
 
-        return ResponseEntity.ok(inventoryService.getInventory(variantId));
+    @GetMapping
+    public ResponseEntity<?> getUserInventory(@RequestParam List<String> variantId) {
+        return ResponseEntity.ok(inventoryService.getUserInventory(variantId));
     }
 
     @PostMapping

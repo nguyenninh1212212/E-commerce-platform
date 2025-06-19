@@ -1,6 +1,5 @@
 package com.example.variant_service.model.dto.res;
 
-import com.example.variant_service.model.Inventory;
 import com.example.variant_service.model.dto.VariantBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class VariantRes extends VariantBase {
+public class VariantUserRes extends VariantBase {
     private String id;
-    private Inventory inventory;
+    private InventoryUserRes inventory;
 }

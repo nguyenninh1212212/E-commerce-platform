@@ -29,8 +29,6 @@ public class KafkaCosumeInventory {
         byte[] event = record.value();
         try {
             VariantEventList variantEventList = VariantEventList.parseFrom(event);
-            log.info("✅ Received variant event list: {}", variantEventList.getVariantEventList());
-
             List<VariantCreatedEvent> createdEvents = variantEventList.getVariantEventList()
                     .stream()
                     .map(ToModel::toVariantEvent)

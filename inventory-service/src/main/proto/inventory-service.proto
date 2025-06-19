@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package inventory;
+
 option java_multiple_files = true;
 option java_package = "inventory";
 
@@ -34,7 +36,7 @@ message InventoryResponseList {
 message StockRequest {
     string variantId = 1;
     int32 quantity = 2;
-}
+}   
 
 message VariantIdRequest {
     string variantId = 1;
@@ -44,10 +46,22 @@ message VariantIdRequestList {
     repeated VariantIdRequest variantId = 1;
 }
 
+message InventoryUserView {
+    string variantId = 1;
+    int32 stockReserved = 2;     
+    int32 stockAvailable = 3;  
+}
+
+message InventoryUserViewList {
+    repeated InventoryUserView views = 1;
+}
+
+
 service InventoryService {
     rpc createInventory (InventoryRequestList) returns (Message);
     rpc confirmStock (StockRequest) returns (Message);
     rpc releaseStock (StockRequest) returns (Message);
     rpc reserveStock (StockRequest) returns (Message);
     rpc getInventory (VariantIdRequestList) returns (InventoryResponseList);
+    rpc getUserInventory (VariantIdRequestList) returns (InventoryUserViewList);
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import com.example.inventory_service.Mapper.ToModel;
 import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
 import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.service.InventoryService;
@@ -13,8 +14,12 @@ import com.example.inventory_service.service.InventoryService;
 import inventory.InventoryRequest;
 import inventory.InventoryResponse;
 import inventory.InventoryResponseList;
+import inventory.InventoryUserView;
+import inventory.InventoryUserViewList;
 import inventory.Message;
 import inventory.VariantIdRequest;
+import inventory.VariantIdRequestList;
+import io.grpc.stub.StreamObserver;
 import inventory.InventoryServiceGrpc.InventoryServiceImplBase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,25 +95,48 @@ public class InventoryGrpcService extends InventoryServiceImplBase {
     }
 
     @Override
-    public void getInventory(inventory.VariantIdRequestList request,
-            io.grpc.stub.StreamObserver<inventory.InventoryResponseList> responseObserver) {
+    public void getInventory(VariantIdRequestList request,
+            StreamObserver<InventoryResponseList> responseObserver) {
         try {
-            List<String> VariantIdList = new ArrayList<>();
-            for (VariantIdRequest variantId : request.getVariantIdList()) {
-                VariantIdList.add(variantId.getVariantId());
-            }
-            List<InventoryResponse> inventoryResponses = inventoryService.getInventory(VariantIdList)
-                    .stream()
-                    .map(ivt -> InventoryResponse.newBuilder().build()).collect(Collectors.toList());
-            InventoryResponseList inventoryResponseList = InventoryResponseList.newBuilder()
+            List<String> variantIdList = request.getVariantIdList().stream()
+                    .map(VariantIdRequest::getVariantId)
+                    .collect(Collectors.toList());
+
+            List<InventoryResponse> inventoryResponses = inventoryService.getAllInventory(variantIdList).stream()
+                    .map(ToModel::toInventoryProtoResponse)
+                    .collect(Collectors.toList());
+            InventoryResponseList responseList = InventoryResponseList.newBuilder()
                     .addAllResponses(inventoryResponses)
                     .build();
-            responseObserver.onNext(inventoryResponseList);
+
+            responseObserver.onNext(responseList);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            log.info("Get inventorys error  : ", e.getMessage());
-        }
+            log.error("Get inventorys error: ", e);
+            responseObserver.onError(e);
 
+        }
+    }
+
+    @Override
+    public void getUserInventory(inventory.VariantIdRequestList request,
+            io.grpc.stub.StreamObserver<inventory.InventoryUserViewList> responseObserver) {
+        try {
+            List<String> variantIdList = request.getVariantIdList().stream()
+                    .map(VariantIdRequest::getVariantId)
+                    .collect(Collectors.toList());
+            List<InventoryUserView> inventoryResponses = inventoryService.getAllInventory(variantIdList).stream()
+                    .map(ToModel::toInventoryUserProtoResponse)
+                    .collect(Collectors.toList());
+            InventoryUserViewList responseList = InventoryUserViewList.newBuilder()
+                    .addAllViews(inventoryResponses)
+                    .build();
+            responseObserver.onNext(responseList);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Get inventorys user error: ", e);
+            responseObserver.onError(e);
+        }
     }
 
 }

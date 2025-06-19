@@ -34,7 +34,7 @@ public class ProductServImpl implements ProductService {
         private final CloudServiceGrpcClient cloudServiceGrpcClient;
 
         @Override
-        public String addProduct(ProductReq req, String img) {
+        public String addProduct(ProductReq req, List<String> imgs) {
                 Product product = Product.builder()
                                 .name(req.getName())
                                 .price(req.getPrice())
@@ -47,14 +47,13 @@ public class ProductServImpl implements ProductService {
                                 .sales(req.getSales())
                                 .inventory(req.getInventory())
                                 .sellerId("abc123")
-                                .imageUrl(List.of(img))
+                                .imageUrl(imgs)
                                 .build();
                 mongoTemplate.save(product);
                 return product.getId();
         }
 
         @Override
-
         public ProductRes getProductById(String id) {
                 Product product = mongoTemplate.findById(id, Product.class);
                 if (product == null) {
