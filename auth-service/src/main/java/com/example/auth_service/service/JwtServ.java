@@ -4,10 +4,11 @@ import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.example.auth_service.model.entity.Auth;
@@ -15,26 +16,24 @@ import com.example.auth_service.repo.AuthRepo;
 import com.example.auth_service.repo.AuthSpeci;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServ {
 
     private final AuthRepo authRepo;
 
-    private final UserDetailsService userDetailsService;
     @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
     private String SECRET_KEY;
     private final long ACCESS_TOKEN_EXPIRED = 1000 * 60 * 15; // 15 phút
     private final long REFRESH_TOKEN_EXPIRED = 1000 * 60 * 60 * 24 * 7;
-
-    JwtServ(UserDetailsService userDetailsService, AuthRepo authRepo) {
-        this.userDetailsService = userDetailsService;
-        this.authRepo = authRepo;
-    } // 7 ngày
 
     public String accessToken(UserDetails userDetails) {
         return Jwts
@@ -62,13 +61,17 @@ public class JwtServ {
         return authRepo.findOne(spec).isPresent();
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpired(token).before(new Date());
+    public void validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith((SecretKey) getSignKey())
+                    .build()
+                    .parseSignedClaims(token);
+        } catch (SignatureException e) {
+            throw new JwtException("Invalid JWT signature");
+        } catch (JwtException e) {
+            throw new JwtException("Invalid JWT");
+        }
     }
 
     public String extractUsername(String token) {

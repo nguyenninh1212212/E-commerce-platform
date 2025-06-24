@@ -1,19 +1,18 @@
 package com.example.cloud_service.cloud;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.cloud_service.config.CloudConfig;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class CloudServ {
 
@@ -31,12 +30,12 @@ public class CloudServ {
     }
 
     public List<String> uploads(List<byte[]> datas, String type, String asset_folder) {
-        return datas.stream()
-                .map(data -> {
-                    return uploadToCloudinary(data, type, asset_folder);
-                })
-                .filter(Objects::nonNull)
-                .toList();
+        List<CompletableFuture<String>> futures = datas.stream()
+                .map(data -> CompletableFuture.supplyAsync(() -> uploadToCloudinary(data, type, asset_folder)))
+                .collect(Collectors.toList());
+        return futures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
     }
 
     public void deleteFileByUrl(String imageUrl) {
@@ -46,6 +45,30 @@ public class CloudServ {
                 throw new IllegalArgumentException("Không trích xuất được public_id từ URL");
             }
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi xóa tệp từ Cloudinary: " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteListFile(List<String> files) {
+        try {
+            List<String> publicIds = files.stream()
+                    .map(CloudServ::getPublicId)
+                    .collect(Collectors.toList());
+
+            List<CompletableFuture<Void>> futures = publicIds.stream()
+                    .map(id -> CompletableFuture.runAsync(() -> {
+                        try {
+                            Map result = cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
+                            log.info("Deleted {}: {}", id, result);
+                        } catch (Exception ex) {
+                            log.error("Failed to delete file {}: {}", id, ex.getMessage());
+                        }
+                    }))
+                    .collect(Collectors.toList());
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi xóa tệp từ Cloudinary: " + e.getMessage(), e);
         }

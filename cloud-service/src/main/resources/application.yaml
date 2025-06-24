@@ -8,13 +8,3 @@ server:
 grpc:
   server:
     port: 4041
-
-cloudinary:
-  apiKey: 863938529749295
-  apiSecret: ezwBvkmvEwE7ZzquiJ35gNQW2PU
-  cloudName: dxpyuj1mm
-  maxFileSize: 55242880
-  allowedMimeTypes:
-    - image/png
-    - image/jpeg
-    - image/jpg

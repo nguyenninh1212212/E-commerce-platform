@@ -8,7 +8,7 @@ spring:
     multipart:
       enabled: true
       strict-servlet-compliance: true
-      
+
 grpc:
   server:
     port: 4043

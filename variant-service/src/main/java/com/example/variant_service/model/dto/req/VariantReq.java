@@ -17,5 +17,5 @@ import lombok.experimental.SuperBuilder;
 public class VariantReq extends VariantBase {
     @NotNull(groups = { add.class })
     @Min(value = 0, groups = { add.class })
-    private Integer quantity;
+    private int quantity;
 }

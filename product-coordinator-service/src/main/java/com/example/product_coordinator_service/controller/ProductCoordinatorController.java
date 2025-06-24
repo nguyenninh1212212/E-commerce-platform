@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.product_coordinator_service.model.dto.req.Product;
 import com.example.product_coordinator_service.model.dto.req.Variant;
+import com.example.product_coordinator_service.model.dto.res.ApiRes;
 import com.example.product_coordinator_service.service.ProductCoordinatorService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,29 +21,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
-@RequestMapping("/product-variant")
 @RequiredArgsConstructor
 public class ProductCoordinatorController {
-    private final ProductCoordinatorService coordinatorService;
+        private final ProductCoordinatorService coordinatorService;
 
-    @PostMapping("/cre")
-    public ResponseEntity<String> createProductAndVariant(
-            @RequestPart Product product,
-            @RequestPart List<Variant> variant,
-            @RequestPart MultipartFile[] file
+        @PostMapping("/cre")
+        public ResponseEntity<ApiRes<String>> createProductAndVariant(
+                        @RequestPart Product product,
+                        @RequestPart List<Variant> variant,
+                        @RequestPart MultipartFile[] file
 
-    ) throws InterruptedException, ExecutionException {
-        CompletableFuture<String> future = coordinatorService.CreateProductAndVariants(product, variant, file);
-        return ResponseEntity.ok(future.get().toString());
-    }
+        ) {
+                coordinatorService.CreateProductAndVariants(product, variant, file);
+                ApiRes<String> response = ApiRes.<String>builder()
+                                .data("Product create successfully!!")
+                                .build();
+                return ResponseEntity.ok(response);
+        }
 
-    @PostMapping("/del")
-    public ResponseEntity<String> deleteProductAndVariant(
-            @RequestParam String product
+        @PostMapping("/del")
+        public ResponseEntity<ApiRes<String>> deleteProductAndVariant(
+                        @RequestParam String product
 
-    ) throws InterruptedException, ExecutionException {
-        CompletableFuture<String> future = coordinatorService.DeleteProductAndVariantsById(product);
-        return ResponseEntity.ok(future.get().toString());
-    }
+        ) {
+                String result = coordinatorService.DeleteProductAndVariantsById(product);
+                ApiRes<String> response = ApiRes.<String>builder()
+                                .data(result)
+                                .build();
+                return ResponseEntity.ok(response);
+        }
 
 }

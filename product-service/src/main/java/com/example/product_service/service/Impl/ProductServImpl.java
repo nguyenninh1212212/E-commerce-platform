@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.product_service.grpc.client.CloudServiceGrpcClient;
 import com.example.product_service.grpc.client.VariantServiceGrpcClient;
+import com.example.product_service.mapper.ToModel;
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Variants;
 import com.example.product_service.model.dto.req.ProductReq;
@@ -18,6 +19,7 @@ import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.entity.Product;
+import com.example.product_service.model.enums.ProductStatus;
 import com.example.product_service.model.enums.VariantsStatus;
 import com.example.product_service.service.ProductService;
 
@@ -40,6 +42,7 @@ public class ProductServImpl implements ProductService {
                                 .price(req.getPrice())
                                 .description(req.getDescription())
                                 .tag(req.getTags())
+                                .status(ProductStatus.PENDING)
                                 .reviewCount(0)
                                 .rating(0)
                                 .price(req.getPrice())
@@ -60,37 +63,9 @@ public class ProductServImpl implements ProductService {
                         throw new IllegalArgumentException("Product not found with id: " + id);
                 }
                 List<VariantResponse> variantList = variantServiceGrpcClient.getVariantByProductId(id);
-                List<Variants> variants = variantList != null ? variantList.stream()
-                                .map(variantResponse -> Variants.builder()
-                                                .id(variantResponse.getId())
-                                                .quantity(variantResponse.getQuantity())
-                                                .productId(id)
-                                                .attributes(variantResponse.getAttributesList().stream()
-                                                                .map(attr -> Attributes.builder()
-                                                                                .name(attr.getName())
-                                                                                .value(attr.getValuesList())
-                                                                                .build())
-                                                                .toList())
-                                                .status(VariantsStatus.valueOf(variantResponse.getStatus().name()))
-                                                .price(variantResponse.getPrice())
-                                                .build())
-                                .toList() : new java.util.ArrayList<>();
-                ProductRes res = ProductRes.builder()
-                                .id(product.getId())
-                                .name(product.getName())
-                                .description(product.getDescription())
-                                .price(product.getPrice())
-                                .discount(product.getPrice() - (product.getPrice() * product.getSales()) / 100)
-                                .sales(product.getSales())
-                                .inventory(product.getInventory())
-                                .rating(product.getRating())
-                                .reviewCount(product.getReviewCount())
-                                .attributes(product.getAttributes())
-                                .tags(product.getTag())
-                                .imageUrl(product.getImageUrl())
-                                .variants(variants)
-                                .sellerId(id)
-                                .build();
+                List<Variants> variants = variantList != null ? ToModel.toVariantsRes(variantList, id)
+                                : new java.util.ArrayList<>();
+                ProductRes res = ToModel.toRes(product, variants, "sellerId");
                 return res;
         }
 
@@ -99,13 +74,7 @@ public class ProductServImpl implements ProductService {
                                 .limit(limit)
                                 .with(Sort.by(Sort.Direction.ASC, "createdAt"));
                 List<ProductFeaturedRes> products = mongoTemplate.find(query, Product.class).stream()
-                                .map(product -> ProductFeaturedRes.builder()
-                                                .id(product.getId())
-                                                .name(product.getName())
-                                                .sales(product.getSales())
-                                                .price(product.getPrice())
-                                                .image(product.getImageUrl().get(0))
-                                                .build())
+                                .map(ToModel::toFeatureRes)
                                 .toList();
                 return Pagination.<List<ProductFeaturedRes>>builder().limit(20).page(0).result(products).build();
         }
@@ -139,7 +108,7 @@ public class ProductServImpl implements ProductService {
                         throw new IllegalArgumentException("Product not found with id: " + id);
                 }
                 try {
-                        cloudServiceGrpcClient.deleteImg(product.getImageUrl().get(0));
+                        cloudServiceGrpcClient.deleteImgs(product.getImageUrl());
                 } catch (Exception e) {
                         log.info("delete product fail : ", e.getMessage());
                 }

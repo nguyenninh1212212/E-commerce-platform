@@ -2,12 +2,11 @@ package com.example.auth_service.model.dto.req;
 
 import java.sql.Date;
 
-import org.springframework.web.multipart.MultipartFile;
+import javax.validation.constraints.NotBlank;
 
 import com.example.auth_service.validate.ForgorPasswordValidate;
 import com.example.auth_service.validate.LoginValidationGroup;
 import com.example.auth_service.validate.RegisterValidationGroup;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

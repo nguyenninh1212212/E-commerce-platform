@@ -12,6 +12,9 @@ message CloudRequest {
 message CloudUrl {
     string url = 1;
 }
+message CloudUrls {
+   repeated string url = 1;
+}
 
 message Messages {
     string value = 1;
@@ -20,4 +23,5 @@ message Messages {
 service CloudService {
     rpc upload(CloudRequest) returns (CloudUrl);
     rpc delete(CloudUrl) returns (Messages);
+    rpc deletes(CloudUrls) returns (Messages);
 }

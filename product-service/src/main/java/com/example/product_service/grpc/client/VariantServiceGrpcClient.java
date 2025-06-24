@@ -37,7 +37,7 @@ public class VariantServiceGrpcClient {
 
                         return response;
                 } catch (Exception e) {
-                        return new ArrayList<>();
+                        throw new RuntimeException("Variant grpc error : " + e.getMessage());
                 }
         }
 }

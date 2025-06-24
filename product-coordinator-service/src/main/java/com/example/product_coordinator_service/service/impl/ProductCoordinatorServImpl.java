@@ -10,6 +10,7 @@ import com.example.product_coordinator_service.grpc.client.ProductServiceGrpcCli
 import com.example.product_coordinator_service.grpc.client.VariantServiceGrpcClient;
 import com.example.product_coordinator_service.model.dto.req.Product;
 import com.example.product_coordinator_service.model.dto.req.Variant;
+import com.example.product_coordinator_service.model.dto.res.ApiRes;
 import com.example.product_coordinator_service.service.ProductCoordinatorService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,13 @@ public class ProductCoordinatorServImpl implements ProductCoordinatorService {
     private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
     @Override
-    public CompletableFuture<String> CreateProductAndVariants(Product reqProduct, List<Variant> reqVariantList,
-            MultipartFile[] file) {
+    public void CreateProductAndVariants(Product reqProduct, List<Variant> reqVariantList,
+            MultipartFile[] files) {
         List<byte[]> fileBytes = new ArrayList<>();
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture.supplyAsync(() -> {
             try {
-                for (byte[] filebyte : fileBytes) {
-                    fileBytes.add(filebyte);
+                for (MultipartFile file : files) {
+                    fileBytes.add(file.getBytes());
                 }
                 return fileBytes;
             } catch (Exception e) {
@@ -47,7 +48,7 @@ public class ProductCoordinatorServImpl implements ProductCoordinatorService {
     }
 
     @Override
-    public CompletableFuture<String> DeleteProductAndVariantsById(String productId) {
+    public String DeleteProductAndVariantsById(String productId) {
         CompletableFuture<Void> deleteProduct = CompletableFuture.runAsync(() -> {
             productServiceGrpcClient.DeleteProduct(productId);
         });
@@ -58,7 +59,7 @@ public class ProductCoordinatorServImpl implements ProductCoordinatorService {
                 .thenApply(v -> "Delete product and variant with ID : " + productId)
                 .exceptionally(ex -> {
                     return "Failed to delete product and variants: " + ex.getMessage();
-                });
+                }).toString();
     }
 
 }

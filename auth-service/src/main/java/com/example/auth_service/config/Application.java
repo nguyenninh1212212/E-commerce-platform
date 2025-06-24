@@ -14,6 +14,8 @@ import com.example.auth_service.repo.AuthRepo;
 import com.example.auth_service.repo.AuthSpeci;
 
 import lombok.RequiredArgsConstructor;
+import net.devh.boot.grpc.server.security.authentication.BasicGrpcAuthenticationReader;
+import net.devh.boot.grpc.server.security.authentication.GrpcAuthenticationReader;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,4 +46,8 @@ public class Application {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    @Bean
+    public GrpcAuthenticationReader grpcAuthenticationReader() {
+        return new BasicGrpcAuthenticationReader();
+    }
 }

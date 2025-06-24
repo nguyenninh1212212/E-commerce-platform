@@ -7,8 +7,6 @@ option java_package = "inventory";
 
 import "shared/inventory.proto";
 
-message Empty {}
-
 message Message {
     string value = 1;
 }

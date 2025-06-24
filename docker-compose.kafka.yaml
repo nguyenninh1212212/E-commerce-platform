@@ -1,7 +1,9 @@
+version: '3.8'
 
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -12,11 +14,12 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.3.2
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
-      - "29092:29092"   # mapping port nội bộ Kafka với host nếu cần
+      - "9092:9092"     # dùng cho các container trong network
+      - "29092:29092"   # dùng cho máy host (localhost)
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -27,6 +30,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - E_COMMERCE_PLATFORM-net   
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -35,10 +39,10 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_ZOOKEEPER=zk:2181
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181  # <- fix tên đúng
     networks:
       - E_COMMERCE_PLATFORM-net  
 
 networks:
   E_COMMERCE_PLATFORM-net:
-    driver: bridge
+    external: true

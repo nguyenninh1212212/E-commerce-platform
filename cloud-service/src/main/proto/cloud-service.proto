@@ -31,4 +31,5 @@ service CloudService {
     rpc upload(CloudRequest) returns (CloudUrl);
     rpc uploads(CloudRequests) returns (CloudUrls);
     rpc delete(CloudUrl) returns (Messages);
+    rpc deletes(CloudUrls) returns (Messages);
 }

@@ -1,6 +1,7 @@
 package com.example.cloud_service.grpc.server;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.cloud_service.cloud.CloudServ;
 
@@ -58,13 +59,27 @@ public class CloudGrpcService extends CloudServiceGrpc.CloudServiceImplBase {
             io.grpc.stub.StreamObserver<cloud.Messages> responseObserver) {
         try {
             cloudServ.deleteFileByUrl(request.getUrl());
-            Messages res = Messages.newBuilder().setValue("delete media successfully!!").build();
+            Messages res = Messages.newBuilder().setValue("Delete media successfully!!").build();
             responseObserver.onNext(res);
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.info("delete error : ", e.getMessage());
             responseObserver.onError(e);
 
+        }
+    }
+
+    @Override
+    public void deletes(cloud.CloudUrls request,
+            io.grpc.stub.StreamObserver<cloud.Messages> responseObserver) {
+        try {
+            cloudServ.deleteListFile(request.getUrlList());
+            Messages res = Messages.newBuilder().setValue("Delete medias successfully!!").build();
+            responseObserver.onNext(res);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.info("Delete list file error : ", e.getMessage());
+            responseObserver.onError(e);
         }
     }
 

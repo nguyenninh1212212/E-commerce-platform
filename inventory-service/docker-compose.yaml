@@ -9,7 +9,7 @@ services:
       - "8090:8090"
       - "4050:4050" 
     environment:
-      - SPRING_PROFILES_ACTIVE=docker  
+    - SPRING_PROFILES_ACTIVE=docker  
     networks:
       - E_COMMERCE_PLATFORM-net
 networks:

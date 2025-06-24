@@ -4,8 +4,11 @@ import java.net.Authenticator;
 import java.time.Instant;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,6 +43,7 @@ public class AuthServ {
     public AuthRes register(AuthReq req) {
         Specification<Auth> spec = Specification.where(AuthSpeci.hasUsername(req.getUsername()));
         Specification<Auth> spec2 = Specification.where(AuthSpeci.hasEmail(req.getEmail()));
+
         if (authRepo.findOne(spec).isPresent()) {
             throw new AlreadyExistException("User already exist");
         }
@@ -62,27 +66,24 @@ public class AuthServ {
         String refresh = jwtServ.refreshToken(auth);
         String access = jwtServ.accessToken(auth);
         auth.setRefreshToken(refresh);
+        authRepo.save(auth);
         return AuthRes.builder().access(access).refresh(refresh).build();
 
     }
 
     public AuthRes login(AuthReq req) {
         try {
-            authenticationManager.authenticate(
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+            Auth auth = (Auth) authentication.getPrincipal();
+            String access = jwtServ.accessToken(auth);
+            String refresh = jwtServ.refreshToken(auth);
+            auth.setRefreshToken(refresh);
+            authRepo.save(auth);
+            return AuthRes.builder().access(access).refresh(refresh).build();
         } catch (AuthenticationException ex) {
             throw new NotFound("Username not found");
         }
-        Specification<Auth> spec = Specification
-                .where(AuthSpeci.hasUsername(req.getUsername()));
-
-        Auth auth = authRepo.findOne(spec).get();
-        // Tạo token
-        String access = jwtServ.accessToken(auth);
-        String refresh = jwtServ.refreshToken(auth);
-        auth.setRefreshToken(refresh);
-        authRepo.save(auth);
-        return AuthRes.builder().access(access).refresh(refresh).build();
 
     }
 
@@ -96,5 +97,12 @@ public class AuthServ {
         String newAccessToken = jwtServ.accessToken(auth);
         return newAccessToken;
 
+    }
+
+    public void validateToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid authorization header");
+        }
+        jwtServ.validateToken(authHeader.substring(7));
     }
 }
