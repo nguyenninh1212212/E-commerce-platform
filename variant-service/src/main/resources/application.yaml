@@ -18,3 +18,7 @@ grpc:
     inventory-client:
       address: static://localhost:4050
       negotiationType: PLAINTEXT
+
+kafka-topic:
+  variant-create: variant-create
+  variant-delete: variant-delete

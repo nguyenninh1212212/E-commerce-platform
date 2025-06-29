@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.example.variant_service.mapper.ToModel;
+import com.example.variant_service.mapper.ToProto;
 import com.example.variant_service.model.dto.req.VariantReq;
-import com.example.variant_service.model.dto.res.VariantRes;
 import com.example.variant_service.model.dto.res.VariantUserRes;
-import com.example.variant_service.model.enums.Status;
 import com.example.variant_service.service.VariantServ;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import variant.VariantServiceGrpc;
 import variant.GetVariantsRequest;
 import variant.VariantResponse;
-import variant.Attribute;
+import shared.Attribute;
 import variant.CreateVariantsRequest;
-import variant.Message; // Renamed from 'res' in proto to match Java naming convention
+import shared.Empty;
 
 @Slf4j
 @GrpcService
@@ -27,28 +27,6 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
 
     @Autowired
     private VariantServ variantServ;
-
-    private static variant.Status toProtoStatus(Status status) {
-        if (status == null)
-            return variant.Status.UNKNOWN;
-        return switch (status) {
-            case SOLD_OUT -> variant.Status.SOLD_OUT;
-            case IN_STOCK -> variant.Status.IN_STOCK;
-            case PRE_ORDER -> variant.Status.PRE_ORDER;
-            case DISCONTINUED -> variant.Status.DISCONTINUED;
-            default -> variant.Status.UNKNOWN;
-        };
-    }
-
-    private static Status toStatus(variant.Status status) {
-        return switch (status) {
-            case SOLD_OUT -> Status.SOLD_OUT;
-            case IN_STOCK -> Status.IN_STOCK;
-            case PRE_ORDER -> Status.PRE_ORDER;
-            case DISCONTINUED -> Status.DISCONTINUED;
-            default -> Status.UNKNOWN;
-        };
-    }
 
     @Override
     public void getVariants(GetVariantsRequest request, io.grpc.stub.StreamObserver<VariantResponse> responseObserver) {
@@ -59,7 +37,7 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                         .setId(variant.getId())
                         .setPrice(variant.getPrice())
                         .setSku(variant.getSku())
-                        .setStatus(toProtoStatus(variant.getStatus()))
+                        .setStatus(ToProto.toProtoStatus(variant.getStatus()))
                         .addAllAttributes(
                                 variant.getAttributes().stream()
                                         .map(attr -> Attribute.newBuilder()
@@ -81,14 +59,14 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
     }
 
     @Override
-    public void createVariants(CreateVariantsRequest request, io.grpc.stub.StreamObserver<Message> responseObserver) {
+    public void createVariants(CreateVariantsRequest request, io.grpc.stub.StreamObserver<Empty> responseObserver) {
         try {
             List<VariantReq> variantList = new ArrayList<>();
             request.getVariantsList().forEach(variantReq -> {
                 variantList.add(
                         VariantReq.builder()
                                 .price(variantReq.getPrice())
-                                .status(toStatus(variantReq.getStatus()))
+                                .status(ToModel.toStatus(variantReq.getStatus()))
                                 .sku(variantReq.getSku())
                                 .attributes(variantReq.getAttributesList().stream()
                                         .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
@@ -97,8 +75,7 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                                 .build());
             });
             variantServ.createVariantList(variantList, request.getProductId());
-            Message response = Message.newBuilder().setValue("Variants created successfully").build();
-            responseObserver.onNext(response);
+            responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("Error in createVariants: {}", e.getMessage(), e);
@@ -111,11 +88,10 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
 
     @Override
     public void deleteVariantsByProductId(GetVariantsRequest request,
-            io.grpc.stub.StreamObserver<Message> responseObserver) {
+            io.grpc.stub.StreamObserver<Empty> responseObserver) {
         try {
             variantServ.deleteVariantsByProductId(request.getProductId());
-            Message response = Message.newBuilder().setValue("Variants deleted successfully").build();
-            responseObserver.onNext(response);
+            responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             log.error("Error in deleteVariantsByProductId: {}", e.getMessage(), e);

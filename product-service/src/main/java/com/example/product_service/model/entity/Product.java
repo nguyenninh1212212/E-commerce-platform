@@ -26,7 +26,6 @@ public class Product {
     private String description;
     private ProductStatus status;
     private int sales;
-    private int inventory;
     private double price;
     private String sellerId;
     private int rating;

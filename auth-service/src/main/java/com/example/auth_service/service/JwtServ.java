@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.example.auth_service.excep.UnauthorizedException;
 import com.example.auth_service.model.entity.Auth;
 import com.example.auth_service.repo.AuthRepo;
 import com.example.auth_service.repo.AuthSpeci;
@@ -63,14 +64,19 @@ public class JwtServ {
 
     public void validateToken(String token) {
         try {
-            Jwts.parser()
+            Claims claims = Jwts.parser()
                     .verifyWith((SecretKey) getSignKey())
                     .build()
-                    .parseSignedClaims(token);
-        } catch (SignatureException e) {
-            throw new JwtException("Invalid JWT signature");
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                throw new JwtException("Token has expired");
+            }
+
         } catch (JwtException e) {
-            throw new JwtException("Invalid JWT");
+            throw new UnauthorizedException("Invalid JWT");
         }
     }
 
@@ -80,7 +86,6 @@ public class JwtServ {
 
     public Date extractExpired(String token) {
         return extractClaim(token, Claims::getExpiration);
-
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claim) {

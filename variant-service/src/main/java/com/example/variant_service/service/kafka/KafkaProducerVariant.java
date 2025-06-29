@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.event.VariantEvent;
 import variant.event.VariantEventList;
+import variant.event.VariantIdsEvent;
 
 @Slf4j
 @Service
@@ -19,13 +20,13 @@ import variant.event.VariantEventList;
 public class KafkaProducerVariant {
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
 
-    public void sendEvent(List<VariantCreatedEvent> createdEvents) {
+    public void sendCreateEvent(List<VariantCreatedEvent> createdEvents) {
         List<VariantEvent> variantEventArrList = new ArrayList<>();
         for (VariantCreatedEvent variantCreatedEvent : createdEvents) {
             try {
                 VariantEvent event = VariantEvent
                         .newBuilder()
-                        .setEventType("VARIANT_CREATE")
+                        .setEventType("INVENTORY_CREATE")
                         .setQuantity(variantCreatedEvent.getQuantity())
                         .setVariantId(variantCreatedEvent.getVariantId())
                         .build();
@@ -40,11 +41,25 @@ public class KafkaProducerVariant {
                 .build();
 
         try {
-            String key = createdEvents.get(0).getVariantId(); 
-            kafkaTemplate.send("inventory", key, variantEventList.toByteArray());
+            String key = createdEvents.get(0).getVariantId();
+            kafkaTemplate.send("inventory-create", key, variantEventList.toByteArray());
             log.info("Sending event to Kafka with {} variants", variantEventArrList.size());
         } catch (Exception e) {
             log.error("Error send event InventoryCreateEvent : {}", e);
+        }
+    }
+
+    public void sendDeleteEvent(List<String> variantIds) {
+
+        VariantIdsEvent event = VariantIdsEvent.newBuilder()
+                .addAllVariantId(variantIds)
+                .build();
+        try {
+            String key = event.getVariantId(0);
+            kafkaTemplate.send("inventory-delete", key, event.toByteArray());
+            log.info("Sending event to Kafka with {} variants", variantIds.size());
+        } catch (Exception e) {
+            log.error("Error send event InventoryDeleteEvent : {}", e.getMessage());
         }
     }
 

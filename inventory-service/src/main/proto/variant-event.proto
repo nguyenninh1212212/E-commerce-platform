@@ -10,6 +10,11 @@ message VariantEvent{
     string eventType= 3;
 }
 
+message VariantIdsEvent{
+    repeated string variantId = 1;
+  }
+
+
 message VariantEventList{
     repeated VariantEvent variantEvent = 1;
 }

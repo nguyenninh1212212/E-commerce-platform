@@ -16,6 +16,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.event.VariantEventList;
+import variant.event.VariantIdsEvent;
 
 @Slf4j
 @Service
@@ -23,8 +24,8 @@ import variant.event.VariantEventList;
 public class KafkaCosumeInventory {
     private final InventoryService inventoryService;
 
-    @KafkaListener(topics = "inventory", groupId = "inventory-service")
-    public void consumeEvent(
+    @KafkaListener(topics = "inventory-create", groupId = "inventory-service")
+    public void consumeCreateEvent(
             ConsumerRecord<String, byte[]> record) {
         byte[] event = record.value();
         try {
@@ -35,11 +36,23 @@ public class KafkaCosumeInventory {
                     .toList();
 
             inventoryService.createInventory(createdEvents);
-            createdEvents.forEach(e -> log.info("📦 Variant received: {}", e));
-
         } catch (InvalidProtocolBufferException e) {
             log.error("❌ Error deserializing VariantEventList: {}", e.getMessage(), e);
         }
     }
 
+    @KafkaListener(topics = "inventory-update", groupId = "inventory-service")
+    public void consumeDeleteEvent(ConsumerRecord<String, byte[]> record) {
+        byte[] event = record.value();
+        try {
+            VariantIdsEvent variantIdsEvent = VariantIdsEvent.parseFrom(event);
+            List<String> variantIds = variantIdsEvent.getVariantIdList()
+                    .stream()
+                    .collect(Collectors.toList());
+            inventoryService.deleteInventorys(variantIds);
+        } catch (InvalidProtocolBufferException e) {
+            log.error("❌ Error deserializing VariantEventList: {}", e.getMessage(), e);
+
+        }
+    }
 }

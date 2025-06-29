@@ -54,13 +54,9 @@ public class JwtValidationGatewayFilterFactory
             String method = exchange.getRequest().getMethod().name();
             String routeKey = method + ":" + path;
 
-            log.info("Processing request for route: {}", routeKey);
+            log.info("Processing request for route: {}", path);
             for (String skip : config.getSkippedRoutes()) {
-                log.info("Skipping JWT validation for route: {}", skip.replace("**", ".*"));
-
                 if (routeKey.matches(skip.replace("**", ".*"))) {
-                    log.info("Skipping JWT validation for route: {}", skip.replace("**", ".*"));
-
                     return chain.filter(exchange);
                 }
             }
@@ -71,7 +67,7 @@ public class JwtValidationGatewayFilterFactory
                         token == null ? "Missing Authorization header" : "Invalid Authorization header format");
             }
             return webClient.get()
-                    .uri("/validate")
+                    .uri("/auth/validate")
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .retrieve()
                     .toBodilessEntity()

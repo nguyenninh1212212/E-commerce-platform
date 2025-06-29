@@ -1,5 +1,6 @@
 package com.example.inventory_service.repos;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface InventoryRepo extends JpaRepository<Inventory, String> {
     @Query("SELECT iv FROM Inventory iv WHERE iv.variantId = :variantId")
     Optional<Inventory> findByVariantId(String variantId);
 
+    @Query("SELECT iv FROM Inventory iv WHERE iv.variantId IN :variantIds")
+    List<Inventory> findByVariantIds(List<String> variantIds);
 }

@@ -3,9 +3,9 @@ package com.example.product_service.mapper;
 import java.util.List;
 
 import com.example.product_service.model.Attributes;
-import com.example.product_service.model.Variants;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
+import com.example.product_service.model.dto.res.VariantRes;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.VariantsStatus;
 
@@ -14,7 +14,7 @@ import variant.VariantResponse;
 
 @UtilityClass
 public class ToModel {
-        public ProductRes toRes(Product product, List<Variants> variants, String sellerId) {
+        public ProductRes toRes(Product product, List<VariantRes> variants, String sellerId) {
                 return ProductRes.builder()
                                 .id(product.getId())
                                 .name(product.getName())
@@ -22,7 +22,6 @@ public class ToModel {
                                 .price(product.getPrice())
                                 .discount(product.getPrice() - (product.getPrice() * product.getSales()) / 100)
                                 .sales(product.getSales())
-                                .inventory(product.getInventory())
                                 .rating(product.getRating())
                                 .reviewCount(product.getReviewCount())
                                 .attributes(product.getAttributes())
@@ -33,22 +32,22 @@ public class ToModel {
                                 .build();
         }
 
-        public List<Variants> toVariantsRes(List<VariantResponse> variantList, String productId) {
+        public List<VariantRes> toVariantsRes(List<VariantResponse> variantList, String productId) {
                 return variantList.stream()
-                                .map(variantResponse -> Variants.builder()
+                                .map(variantResponse -> VariantRes.builder()
                                                 .id(variantResponse.getId())
-                                                .quantity(variantResponse.getQuantity())
                                                 .productId(productId)
                                                 .attributes(variantResponse.getAttributesList().stream()
                                                                 .map(attr -> Attributes.builder()
                                                                                 .name(attr.getName())
                                                                                 .value(attr.getValuesList())
                                                                                 .build())
-                                                                .toList())
+                                                                .collect(java.util.stream.Collectors.toList()))
                                                 .status(VariantsStatus.valueOf(variantResponse.getStatus().name()))
                                                 .price(variantResponse.getPrice())
+                                                .quantity(variantResponse.getInventory().getStockAvailable())
                                                 .build())
-                                .toList();
+                                .collect(java.util.stream.Collectors.toList());
         }
 
         public ProductFeaturedRes toFeatureRes(Product product) {

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class InventoryUserRes {
-    private String variantId;
     private int stockReversed;
     private int stockAvaiable;
 }

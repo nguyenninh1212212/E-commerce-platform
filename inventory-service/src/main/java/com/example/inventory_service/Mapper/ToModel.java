@@ -28,7 +28,6 @@ public class ToModel {
         return InventoryUserRes.builder()
                 .stockAvaiable(inventory.getStockAvaiable())
                 .stockReversed(inventory.getStockReversed())
-                .variantId(inventory.getVariantId())
                 .build();
     }
 

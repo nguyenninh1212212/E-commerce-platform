@@ -4,8 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.server.ServerWebExchange;
 
 import com.example.api_gateway.model.dto.res.ErrorResponse;
+
+import reactor.core.publisher.Mono;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -15,6 +19,12 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse error = new ErrorResponse(status.value(), "Field validation error: ");
         return new ResponseEntity<>(error, status);
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    public Mono<Void> handleUnauthorizedException(ServerWebExchange ex) {
+        ex.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        return ex.getResponse().setComplete();
     }
 
     @ExceptionHandler(BaseException.class)

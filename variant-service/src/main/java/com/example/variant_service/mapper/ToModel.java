@@ -1,19 +1,29 @@
 package com.example.variant_service.mapper;
 
-import java.util.List;
-
 import com.example.variant_service.model.Inventory;
 import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.res.InventoryUserRes;
 import com.example.variant_service.model.dto.res.VariantRes;
 import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.model.entity.Variant;
+import com.example.variant_service.model.enums.Status;
 
 import inventory.InventoryUserView;
 import lombok.experimental.UtilityClass;
+import variant.VariantsRequest;
 
 @UtilityClass
 public class ToModel {
+
+    public Status toStatus(variant.Status status) {
+        return switch (status) {
+            case SOLD_OUT -> Status.SOLD_OUT;
+            case IN_STOCK -> Status.IN_STOCK;
+            case PRE_ORDER -> Status.PRE_ORDER;
+            case DISCONTINUED -> Status.DISCONTINUED;
+            default -> Status.UNKNOWN;
+        };
+    }
 
     // --------- Variant Mapping ---------
 
@@ -51,7 +61,7 @@ public class ToModel {
 
     // --------- Shared Builder Logic (private) ---------
 
-    private VariantRes.VariantResBuilder baseVariantBuilder(Variant variant) {
+    public VariantRes.VariantResBuilder baseVariantBuilder(Variant variant) {
         return VariantRes.builder()
                 .id(variant.getId())
                 .attributes(variant.getAttributes())
@@ -60,7 +70,7 @@ public class ToModel {
                 .price(variant.getPrice());
     }
 
-    private VariantUserRes.VariantUserResBuilder baseVariantUserBuilder(Variant variant) {
+    public VariantUserRes.VariantUserResBuilder baseVariantUserBuilder(Variant variant) {
         return VariantUserRes.builder()
                 .id(variant.getId())
                 .attributes(variant.getAttributes())
@@ -68,4 +78,18 @@ public class ToModel {
                 .sku(variant.getSku())
                 .price(variant.getPrice());
     }
+    // --------- VariantsRequest Mapping ---------
+
+    public VariantReq toVariantsReq(VariantsRequest variants) {
+        return VariantReq.builder().price(variants.getPrice())
+                .quantity(variants.getQuantity())
+                .sku(variants.getSku())
+                .status(toStatus(variants.getStatus()))
+                .attributes(variants.getAttributesList().stream()
+                        .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
+                                attr.getValuesList()))
+                        .toList())
+                .build();
+    }
+
 }

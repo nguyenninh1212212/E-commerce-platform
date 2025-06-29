@@ -18,7 +18,6 @@ public class ProductBase {
     private String name;
     private String description;
     private int sales;
-    private int inventory;
     private double price;
     private String sellerId;
     private List<Attributes> attributes;

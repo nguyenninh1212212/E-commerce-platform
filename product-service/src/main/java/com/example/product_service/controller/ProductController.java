@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.product_service.model.dto.req.ProductReq;
 import com.example.product_service.model.dto.req.ProductUpdateReq;
+import com.example.product_service.model.dto.req.VariantReq;
 import com.example.product_service.model.dto.res.ApiRes;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
@@ -23,13 +26,30 @@ import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
 
         private final ProductService productService;
+
+        @PostMapping
+        public ResponseEntity<ApiRes<String>> createProduct(@RequestPart("product") ProductReq req,
+                        @RequestPart("variant") List<VariantReq> variantReq,
+                        @RequestPart(value = "img", required = false) List<MultipartFile> img
+
+        ) {
+
+                productService.addProduct(req, img, variantReq);
+                return ResponseEntity.ok(
+                                ApiRes.<String>builder()
+                                                .status(HttpStatus.OK.value())
+                                                .data("ok")
+                                                .build());
+        }
 
         @GetMapping("/{id}")
         public ResponseEntity<ApiRes<ProductRes>> getProductById(@PathVariable String id) {

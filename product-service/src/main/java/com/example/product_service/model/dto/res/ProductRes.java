@@ -2,7 +2,6 @@ package com.example.product_service.model.dto.res;
 
 import java.util.List;
 
-import com.example.product_service.model.Variants;
 import com.example.product_service.model.dto.ProductBase;
 
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class ProductRes extends ProductBase {
     private int rating;
     private int reviewCount;
     private String sellerName;
-    private List<Variants> variants;
+    private List<VariantRes> variants;
     private List<String> imageUrl;
 
 }

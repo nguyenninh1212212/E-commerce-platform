@@ -84,7 +84,7 @@ public class VariantServImpl implements VariantServ {
 
             createdEvents.add(variantCreatedEvent);
         }
-        kafkaProducer.sendEvent(createdEvents);
+        kafkaProducer.sendCreateEvent(createdEvents);
     }
 
     public void updateVariantPartial(VariantReq req, String id, String productId) {
@@ -131,7 +131,22 @@ public class VariantServImpl implements VariantServ {
     public void deleteVariantsByProductId(String productId) {
         Criteria criteria = Criteria.where("productId").is(productId);
         Query query = new Query(criteria);
-        mongoTemplate.remove(query, Variant.class);
+        try {
+            List<String> variantsIds = mongoTemplate.find(query, Variant.class)
+                    .stream()
+                    .map(Variant::getId)
+                    .toList();
+            if (!variantsIds.isEmpty()) {
+                kafkaProducer.sendDeleteEvent(variantsIds);
+                log.info("Gửi sự kiện xóa Kafka thành công, tiến hành xóa DB");
+
+                // 2. Xoá DB sau khi gửi event
+                mongoTemplate.remove(query, Variant.class);
+            }
+        } catch (Exception e) {
+            log.error("Error in deleteVariantsByProductId: {}", e.getMessage(), e);
+            throw new RuntimeException("Lỗi server khi xóa Variant: " + e.getMessage());
+        }
     }
 
 }

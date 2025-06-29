@@ -1,8 +1,13 @@
 syntax = "proto3";
+
+package variant;
+
 option java_multiple_files = true;
 option java_package = "variant";
 
-import "shared/attribute.proto"; 
+import "shared/attribute.proto";
+import "shared/empty.proto";
+import "shared/inventory.proto";
 
 enum Status {
   UNKNOWN = 0;
@@ -14,10 +19,11 @@ enum Status {
 
 message VariantResponse {
   string id = 1;
-  repeated shared.Attribute attributes = 2; 
+  repeated shared.Attribute attributes = 2;
   Status status = 3;
-  double price = 4;
-  int32 quantity = 5;
+  shared.InventoryResponse inventory = 4;
+  double price = 5;
+  string sku = 6;
 }
 
 message GetVariantsRequest {
@@ -26,9 +32,10 @@ message GetVariantsRequest {
 
 message VariantsRequest {
   repeated shared.Attribute attributes = 1;
-  Status status = 2;
-  double price = 3;
-  string sku = 4;
+  int32 quantity = 2;
+  Status status = 3;
+  double price = 4;
+  string sku = 5;
 }
 
 message CreateVariantsRequest {
@@ -38,4 +45,5 @@ message CreateVariantsRequest {
 
 service VariantService {
   rpc GetVariants(GetVariantsRequest) returns (stream VariantResponse);
+  rpc CreateVariants(CreateVariantsRequest) returns (shared.Empty);
 }

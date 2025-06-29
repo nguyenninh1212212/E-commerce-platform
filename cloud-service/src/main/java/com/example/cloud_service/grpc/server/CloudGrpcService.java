@@ -1,13 +1,18 @@
 package com.example.cloud_service.grpc.server;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.cloud_service.cloud.CloudServ;
+import com.example.cloud_service.mapper.ToModel;
+import com.example.cloud_service.model.dto.Media;
+import com.example.cloud_service.model.dto.req.MediaProductReq;
+import com.example.cloud_service.service.CloudServ;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import cloud.CloudRequests;
 import cloud.CloudServiceGrpc;
 import cloud.CloudUrl;
 import cloud.CloudUrls;
@@ -40,11 +45,12 @@ public class CloudGrpcService extends CloudServiceGrpc.CloudServiceImplBase {
     public void uploads(cloud.CloudRequests request,
             io.grpc.stub.StreamObserver<cloud.CloudUrls> responseObserver) {
         try {
-            List<byte[]> datas = request.getDatasList().stream()
-                    .map(fb -> fb.toByteArray()).toList();
-            String asset_folder = request.getAssetFolder();
-            String type = request.getResourceType();
-            List<String> url = cloudServ.uploads(datas, type, asset_folder);
+            MediaProductReq mediaProductReq = MediaProductReq.builder()
+                    .productId(request.getProductId())
+                    .media(request.getMediaList().stream().map(media -> ToModel.toMedia(media))
+                            .collect(Collectors.toList()))
+                    .build();
+            List<String> url = cloudServ.uploads(mediaProductReq);
             CloudUrls cloudResponse = CloudUrls.newBuilder().addAllUrl(url).build();
             responseObserver.onNext(cloudResponse);
             responseObserver.onCompleted();

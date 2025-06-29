@@ -21,4 +21,6 @@ public interface InventoryService {
     void confirmStock(int quantity, String variantId);
 
     void reserveStock(int quantity, String variantId);
+
+    void deleteInventorys(List<String> variantIds);
 }

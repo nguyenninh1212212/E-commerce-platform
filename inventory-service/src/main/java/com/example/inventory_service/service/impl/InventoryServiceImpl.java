@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.management.Query;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
-
     private final InventoryRepo repo;
     @Value("${limit.lowStockThresold}")
     private int lowStockThresold;
@@ -112,4 +113,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     }
 
+    @Override
+    @Transactional
+    public void deleteInventorys(List<String> variantIds) {
+        List<Inventory> inventories = repo.findByVariantIds(variantIds);
+        if (inventories.isEmpty()) {
+            throw new NotFoundException("No inventories found for the provided variant IDs.");
+        }
+        repo.deleteAll(inventories);
+    }  
 }

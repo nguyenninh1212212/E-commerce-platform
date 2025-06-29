@@ -17,7 +17,6 @@ public class ProductProtoReq {
     private String id;
     private String name;
     private List<Attributes> attribute;
-    private int total;
     private double price;
     private int sale;
 }

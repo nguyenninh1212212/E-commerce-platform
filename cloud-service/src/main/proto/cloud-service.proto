@@ -17,10 +17,22 @@ message Messages {
     string value = 1;
 }
 
+message Media {
+  bytes media = 1;
+  bool isThumbnail = 2;
+  string resourceType = 3;
+  string assetFolder = 4;
+}
+
 message CloudRequests {
-    string assetFolder = 1;
-    string resourceType = 2; 
-    repeated bytes datas = 3;
+    string productId = 1;
+    repeated Media media = 2;
+}
+
+
+message CloudAvatarRequest {
+    Media media=1;
+    string userId=2;
 }
 
 message CloudUrls {

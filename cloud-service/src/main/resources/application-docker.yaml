@@ -3,6 +3,12 @@ spring:
     activate:
       on-profile:
         - docker
+  kafka:
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    bootstrap-servers:
+      - kafka:9092
 
 cloudinary:
   apiKey: ${API_CLOUD_KEY}

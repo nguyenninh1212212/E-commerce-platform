@@ -8,6 +8,8 @@ spring:
     multipart:
       enabled: true
       strict-servlet-compliance: true
+      max-file-size: 10MB
+      max-request-size: 20MB
 
 grpc:
   server:
@@ -19,3 +21,7 @@ grpc:
     cloud-client:
       address: static://localhost:4041
       negotiationType: PLAINTEXT
+
+cloudinary:
+  resourceFile: image
+  assetFolder: products
