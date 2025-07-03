@@ -1,21 +1,26 @@
 package com.example.product_service.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.product_service.annotation.SellerOnly;
 import com.example.product_service.model.dto.req.ProductReq;
 import com.example.product_service.model.dto.req.ProductUpdateReq;
 import com.example.product_service.model.dto.req.VariantReq;
@@ -24,6 +29,7 @@ import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.service.ProductService;
+import com.example.product_service.validator.create;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +43,12 @@ public class ProductController {
         private final ProductService productService;
 
         @PostMapping
-        public ResponseEntity<ApiRes<String>> createProduct(@RequestPart("product") ProductReq req,
-                        @RequestPart("variant") List<VariantReq> variantReq,
-                        @RequestPart(value = "img", required = false) List<MultipartFile> img
-
-        ) {
-
-                productService.addProduct(req, img, variantReq);
+        public ResponseEntity<ApiRes<String>> createProduct(@RequestBody @Validated(create.class) ProductReq product) {
+                log.info(product.getName());
                 return ResponseEntity.ok(
                                 ApiRes.<String>builder()
                                                 .status(HttpStatus.OK.value())
-                                                .data("ok")
+                                                .data(productService.addProduct(product))
                                                 .build());
         }
 
@@ -62,8 +63,10 @@ public class ProductController {
         }
 
         @GetMapping
-        public ResponseEntity<ApiRes<Pagination<List<ProductFeaturedRes>>>> getAllProducts(@RequestParam int page,
-                        @RequestParam int limit) {
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<ApiRes<Pagination<List<ProductFeaturedRes>>>> getAllProducts(
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int limit) {
                 return ResponseEntity.ok(
                                 ApiRes.<Pagination<List<ProductFeaturedRes>>>builder()
                                                 .status(HttpStatus.OK.value())
@@ -103,12 +106,11 @@ public class ProductController {
 
         }
 
-        @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PatchMapping("/{id}")
         public ResponseEntity<Void> updateProduct(
                         @PathVariable String id,
-                        @RequestPart("data") ProductUpdateReq req,
-                        @RequestPart(value = "img", required = false) MultipartFile img) {
-
+                        @RequestBody ProductUpdateReq updates) {
+                productService.updateProduct(id, updates);
                 return ResponseEntity.noContent().build();
         }
 }

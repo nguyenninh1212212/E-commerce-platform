@@ -1,28 +1,30 @@
 package com.example.auth_service.service;
 
 import java.security.Key;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import com.example.auth_service.excep.UnauthorizedException;
 import com.example.auth_service.model.entity.Auth;
+import com.example.auth_service.model.entity.Role;
 import com.example.auth_service.repo.AuthRepo;
-import com.example.auth_service.repo.AuthSpeci;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,80 +33,42 @@ public class JwtServ {
 
     private final AuthRepo authRepo;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
-    private String SECRET_KEY;
-    private final long ACCESS_TOKEN_EXPIRED = 1000 * 60 * 15; // 15 phút
-    private final long REFRESH_TOKEN_EXPIRED = 1000 * 60 * 60 * 24 * 7;
+    @Value("${uri}")
+    private String uri_issuer;
+    private final JwtEncoder jwtEncoder;
 
-    public String accessToken(UserDetails userDetails) {
-        return Jwts
-                .builder()
-                .setSubject(userDetails.getUsername())
-                .claim("role", userDetails.getAuthorities().toString())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRED))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+    public String accessToken(Auth auth) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(uri_issuer) // hoặc dynamic
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plus(Duration.ofMinutes(30)))
+                .subject(auth.getId().toString()) // đây là userId
+                .claim("roles", auth.getRole().stream().map(Role::getName).toList())
+                .claim("scope", List.of("read", "write"))
+                .build();
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        return jwt.getTokenValue();
     }
 
-    public String refreshToken(UserDetails userDetails) {
-        return Jwts
-                .builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+    public String refreshToken(Auth auth) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(uri_issuer)
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plus(Duration.ofDays(7)))
+                .subject(auth.getId().toString())
+                .claim("is_refresh", true)
+                .claim("scope", List.of("read", "write"))
+                .build();
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        return jwt.getTokenValue();
     }
 
-    public boolean isRefreshToken(String token) {
-        String username = extractUsername(token);
-        Specification<Auth> spec = Specification.where(AuthSpeci.hasRefreshToken(token))
-                .and(AuthSpeci.hasUsername(username));
-        return authRepo.findOne(spec).isPresent();
+    public UUID extractUserId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 
-    public void validateToken(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .verifyWith((SecretKey) getSignKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-
-            Date expiration = claims.getExpiration();
-            if (expiration.before(new Date())) {
-                throw new JwtException("Token has expired");
-            }
-
-        } catch (JwtException e) {
-            throw new UnauthorizedException("Invalid JWT");
-        }
+    public boolean isRefreshToken(Jwt jwt) {
+        return jwt.getClaim("is_refresh");
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public Date extractExpired(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claim) {
-        final Claims claims = extractAllClaims(token);
-        return claim.apply(claims);
-
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    private Key getSignKey() {
-        byte keys[] = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keys);
-    }
 }

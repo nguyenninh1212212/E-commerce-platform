@@ -7,24 +7,25 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.product_service.grpc.client.CloudServiceGrpcClient;
 import com.example.product_service.grpc.client.VariantServiceGrpcClient;
 import com.example.product_service.mapper.ToModel;
-import com.example.product_service.model.Attributes;
 import com.example.product_service.model.dto.res.VariantRes;
 import com.example.product_service.model.dto.req.ProductReq;
+import com.example.product_service.model.dto.req.ProductUpdateReq;
 import com.example.product_service.model.dto.req.VariantReq;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.ProductStatus;
-import com.example.product_service.model.enums.VariantsStatus;
 import com.example.product_service.service.ProductService;
 import com.example.product_service.service.kafka.KafkaProducer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,24 +37,13 @@ import variant.VariantResponse;
 public class ProductServImpl implements ProductService {
         private final MongoTemplate mongoTemplate;
         private final VariantServiceGrpcClient variantServiceGrpcClient;
-        private final CloudServiceGrpcClient cloudServiceGrpcClient;
         private final KafkaProducer kafkaProducer;
+        private final ObjectMapper objectMapper;
 
+        @PreAuthorize("hasRole('SELLER')")
         @Override
-        public void addProduct(ProductReq req, List<MultipartFile> imgs, List<VariantReq> variants) {
-                List<byte[]> fileBytes = imgs.stream()
-                                .map(file -> {
-                                        try {
-                                                return file.getBytes();
-                                        } catch (Exception e) {
-                                                log.error("Error reading file bytes: ", e);
-                                                return null;
-                                        }
-                                })
-                                .filter(bytes -> bytes != null)
-                                .toList();
+        public String addProduct(ProductReq req) {
 
-                List<String> imgUrls = cloudServiceGrpcClient.getUrls(fileBytes);
                 Product product = Product.builder()
                                 .name(req.getName())
                                 .price(req.getPrice())
@@ -62,14 +52,18 @@ public class ProductServImpl implements ProductService {
                                 .status(ProductStatus.PENDING)
                                 .reviewCount(0)
                                 .rating(0)
-                                .price(req.getPrice())
                                 .attributes(req.getAttributes())
                                 .sales(req.getSales())
                                 .sellerId("abc123")
-                                .imageUrl(imgUrls)
                                 .build();
                 mongoTemplate.save(product);
-                kafkaProducer.sendEvent(product.getId(), variants);
+
+                try {
+                        kafkaProducer.sendEvent(product.getId(), req.getVariants());
+                } catch (Exception e) {
+                        throw new RuntimeException("Failed to process product creation", e);
+                }
+                return product.getId();
         }
 
         @Override
@@ -123,13 +117,27 @@ public class ProductServImpl implements ProductService {
                         throw new IllegalArgumentException("Product not found with id: " + id);
                 }
                 try {
-                        kafkaProducer.sendMediaDeleteEvent(product.getImageUrl());
                         kafkaProducer.sendDeleteEvent(product.getId());
                 } catch (Exception e) {
                         log.error("delete product fail : ", e.getMessage());
                 }
                 mongoTemplate.remove(product);
 
+        }
+
+        public void updateProduct(String id, ProductUpdateReq updates) {
+                Query query = new Query(Criteria.where("id").is(id));
+                Update update = new Update();
+
+                Map<String, Object> map = objectMapper.convertValue(updates, Map.class);
+
+                // Optionally ignore null fields
+                map.entrySet().stream()
+                                .filter(e -> e.getValue() != null)
+                                .filter(e -> !e.getKey().equals("sellerId")) // Cấm sửa sellerId
+                                .forEach(e -> update.set(e.getKey(), e.getValue()));
+
+                mongoTemplate.updateFirst(query, update, Product.class);
         }
 
 }

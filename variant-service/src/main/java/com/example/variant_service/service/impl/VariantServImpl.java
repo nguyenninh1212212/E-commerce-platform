@@ -140,7 +140,6 @@ public class VariantServImpl implements VariantServ {
                 kafkaProducer.sendDeleteEvent(variantsIds);
                 log.info("Gửi sự kiện xóa Kafka thành công, tiến hành xóa DB");
 
-                // 2. Xoá DB sau khi gửi event
                 mongoTemplate.remove(query, Variant.class);
             }
         } catch (Exception e) {

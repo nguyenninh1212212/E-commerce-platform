@@ -1,8 +1,6 @@
-package com.example.cloud_service.model.dto.req;
+package com.example.auth_service.model.dto.res;
 
 import java.util.List;
-
-import com.example.cloud_service.model.dto.Media;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MediaProductReq {
-    private String productId;
-    private List<Media> media;
+public class AuthJwtRes {
+    private String userId;
+    private List<String> role;
 }

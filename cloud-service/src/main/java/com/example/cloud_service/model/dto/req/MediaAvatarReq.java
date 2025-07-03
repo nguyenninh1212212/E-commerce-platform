@@ -1,7 +1,5 @@
 package com.example.cloud_service.model.dto.req;
 
-import com.example.cloud_service.model.dto.Media;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MediaAvatarReq {
     private String userId;
-    private Media media;
+    private boolean isThumbnail;
 }

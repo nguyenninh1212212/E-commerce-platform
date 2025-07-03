@@ -20,6 +20,6 @@ public class MediaProduct {
     private String id;
     private String productId;
     private String imgName;
-    private boolean isThumbnail;
+    private int position;
     private Instant createdAt;
 }

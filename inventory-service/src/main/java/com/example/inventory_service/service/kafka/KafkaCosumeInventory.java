@@ -24,7 +24,7 @@ import variant.event.VariantIdsEvent;
 public class KafkaCosumeInventory {
     private final InventoryService inventoryService;
 
-    @KafkaListener(topics = "inventory-create", groupId = "inventory-service")
+    @KafkaListener(topics = "inventory-create")
     public void consumeCreateEvent(
             ConsumerRecord<String, byte[]> record) {
         byte[] event = record.value();
@@ -41,7 +41,7 @@ public class KafkaCosumeInventory {
         }
     }
 
-    @KafkaListener(topics = "inventory-update", groupId = "inventory-service")
+    @KafkaListener(topics = "variant-delete")
     public void consumeDeleteEvent(ConsumerRecord<String, byte[]> record) {
         byte[] event = record.value();
         try {

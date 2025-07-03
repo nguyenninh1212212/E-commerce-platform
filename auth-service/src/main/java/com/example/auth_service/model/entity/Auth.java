@@ -11,11 +11,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,17 +38,20 @@ public class Auth implements UserDetails {
         private String googleId;
         private Date birth;
         private String email;
+        @Column(name = "refresh_token", columnDefinition = "TEXT")
         private String refreshToken;
         private Instant createdAt;
         private Instant updatedAt;
         private Instant deletedAt;
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "role")
-        private Role role;
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(name = "auth_role", joinColumns = @JoinColumn(name = "auth_id"), inverseJoinColumns = @JoinColumn(name = "role_name"))
+        private List<Role> role;
 
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-                return List.of(new SimpleGrantedAuthority(role.getName().toString()));
+                return role.stream()
+                                .map(r -> new SimpleGrantedAuthority(r.getName().name()))
+                                .toList();
         }
 
 }

@@ -1,21 +1,24 @@
 package com.example.cloud_service.service;
 
+import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.cloud_service.config.CloudConfig;
-import com.example.cloud_service.model.dto.Media;
+import com.example.cloud_service.controller.MediaController;
 import com.example.cloud_service.model.dto.req.MediaAvatarReq;
-import com.example.cloud_service.model.dto.req.MediaProductReq;
 import com.example.cloud_service.model.entity.MediaAvatar;
 import com.example.cloud_service.model.entity.MediaProduct;
 import com.example.cloud_service.util.handleUrl;
@@ -28,6 +31,9 @@ public class CloudServ {
     private final MongoTemplate mongoTemplate;
     private final Cloudinary cloudinary;
     private final long maxFileSize;
+    private final String RESOURCE_TYPE = "image";
+    private final String ASSET_FOLDER_PRODUCT = "products";
+    private final String ASSET_FOLDER_AVATAR = "avatars";
 
     public CloudServ(MongoTemplate mongoTemplate, Cloudinary cloudinary, CloudConfig cloudConfig) {
         this.mongoTemplate = mongoTemplate;
@@ -35,84 +41,28 @@ public class CloudServ {
         this.maxFileSize = cloudConfig.getMaxFileSize();
     }
 
-    public String upload(byte[] data, String resourceType, String folder) {
-        validateFile(data, resourceType);
-        return uploadToCloudinary(data, resourceType, folder);
-    }
+    private MediaProduct mapToMediaProduct(int index, MultipartFile multipartFile, String productId) {
+        try {
+            byte[] file = multipartFile.getBytes();
+            validateFile(file);
 
-    public void uploadAvatar(MediaAvatarReq mediaAvatarReq) {
-        Media media = mediaAvatarReq.getMedia();
-        String imgName = handleUrl
-                .getFileName(uploadToCloudinary(media.getFile(), media.getResourceType(), media.getAssetFolder()));
-        MediaAvatar mediaAvatar = MediaAvatar.builder()
-                .createdAt(Instant.now())
-                .imgName(imgName)
-                .isThumbnail(media.isThumbnail())
-                .userId(mediaAvatarReq.getUserId())
-                .build();
-        mongoTemplate.save(mediaAvatar);
-    }
+            String fileName = handleUrl.getFileName(
+                    uploadToCloudinary(file, RESOURCE_TYPE, ASSET_FOLDER_PRODUCT));
 
-    public List<String> uploads(MediaProductReq mediaProductReq) {
-        List<MediaProduct> mediaProducts = new ArrayList<>();
-        for (Media media : mediaProductReq.getMedia()) {
-            String fileName = handleUrl
-                    .getFileName(uploadToCloudinary(media.getFile(), media.getResourceType(), media.getAssetFolder()));
-            MediaProduct mediaProduct = MediaProduct.builder()
+            return MediaProduct.builder()
                     .imgName(fileName)
-                    .isThumbnail(media.isThumbnail())
+                    .position(index)
                     .createdAt(Instant.now())
-                    .productId(mediaProductReq.getProductId())
+                    .productId(productId)
                     .build();
-            mediaProducts.add(mediaProduct);
-        }
-        if (!mediaProducts.isEmpty()) {
-            mongoTemplate.insertAll(mediaProducts);
-            return mediaProducts.stream()
-                    .map(MediaProduct::getImgName)
-                    .collect(Collectors.toList());
-        } else {
-            throw new IllegalArgumentException("No media files to upload");
+
+        } catch (IOException e) {
+            log.error("🛑 Failed to process file at index {}: {}", index, e.getMessage(), e);
+            return null;
         }
     }
 
-    public void deleteFileByUrl(String imageUrl) {
-        try {
-            String publicId = getPublicId(imageUrl);
-            if (publicId == null) {
-                throw new IllegalArgumentException("Không trích xuất được public_id từ URL");
-            }
-            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi xóa tệp từ Cloudinary: " + e.getMessage(), e);
-        }
-    }
-
-    public void deleteListFile(List<String> files) {
-        try {
-            List<String> publicIds = files.stream()
-                    .map(CloudServ::getPublicId)
-                    .collect(Collectors.toList());
-
-            List<CompletableFuture<Void>> futures = publicIds.stream()
-                    .map(id -> CompletableFuture.runAsync(() -> {
-                        try {
-                            Map result = cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
-                            log.info("Deleted {}: {}", id, result);
-                        } catch (Exception ex) {
-                            log.error("Failed to delete file {}: {}", id, ex.getMessage());
-                        }
-                    }))
-                    .collect(Collectors.toList());
-
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi xóa tệp từ Cloudinary: " + e.getMessage(), e);
-        }
-    }
-
-    private void validateFile(byte[] data, String contentType) {
+    private void validateFile(byte[] data) {
         if (data == null || data.length == 0) {
             throw new IllegalArgumentException("File data không được để trống");
         }
@@ -126,7 +76,8 @@ public class CloudServ {
         try {
             Map<String, Object> params = ObjectUtils.asMap(
                     "resource_type", resourceType,
-                    "overwrite", true,
+                    "overwrite", false,
+                    "unique_filename", true,
                     "folder", folder);
             Map<String, Object> uploadResult = (Map<String, Object>) cloudinary.uploader().upload(data, params);
             return uploadResult.get("secure_url").toString();
@@ -135,26 +86,86 @@ public class CloudServ {
         }
     }
 
-    private static String getPublicId(String url) {
+    private void deleteByPublicId(String publicId) {
         try {
-            String[] parts = url.split("/upload/");
-            if (parts.length < 2)
-                return null;
-
-            String[] pathParts = parts[1].split("/", 2);
-            if (pathParts.length < 2)
-                return null;
-
-            String publicIdWithExt = pathParts[1];
-            int dotIndex = publicIdWithExt.lastIndexOf(".");
-            if (dotIndex != -1) {
-                return publicIdWithExt.substring(0, dotIndex);
-            } else {
-                return publicIdWithExt;
-            }
-        } catch (Exception e) {
-            return null;
+            Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            log.info("Deleted result: " + result);
+        } catch (IOException e) {
+            log.error("Failed to delete image with publicId " + publicId);
         }
+    }
+
+    public void uploadAvatar(MediaAvatarReq mediaAvatarReq, MultipartFile file) {
+        byte[] media;
+        try {
+            media = file.getBytes();
+            String imgName = handleUrl
+                    .getFileName(
+                            uploadToCloudinary(media, RESOURCE_TYPE,
+                                    ASSET_FOLDER_AVATAR));
+            MediaAvatar mediaAvatar = MediaAvatar.builder()
+                    .createdAt(Instant.now())
+                    .imgName(imgName)
+                    .isThumbnail(mediaAvatarReq.isThumbnail())
+                    .userId(mediaAvatarReq.getUserId())
+                    .build();
+            mongoTemplate.save(mediaAvatar);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void uploads(String productId, List<MultipartFile> files) {
+        List<MediaProduct> mediaProducts = IntStream.range(0, files.size())
+                .mapToObj(i -> mapToMediaProduct(i, files.get(i), productId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (mediaProducts.isEmpty()) {
+            throw new IllegalArgumentException("❌ No valid media files to upload");
+        }
+
+        mongoTemplate.insertAll(mediaProducts);
+    }
+
+    public void deleteByProductId(String productId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("productId").is(productId));
+        List<String> imgNameList = mongoTemplate.find(query, MediaProduct.class).stream()
+                .map(MediaProduct::getImgName)
+                .toList();
+        for (String imgName : imgNameList) {
+            deleteByPublicId(imgName);
+        }
+    }
+
+    public void deleteByUserId(String UserId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("userId").is(UserId));
+        List<String> imgNameList = mongoTemplate.find(query, MediaAvatar.class).stream()
+                .map(MediaAvatar::getImgName)
+                .toList();
+        for (String imgName : imgNameList) {
+            deleteByPublicId(imgName);
+        }
+    }
+
+    public <T> List<String> getMediaUrl(String idObject, String fieldObject, Class<T> clazz, String Asset_folder,
+            java.util.function.Function<T, String> imgNameExtractor) {
+        Query query = new Query(Criteria.where(fieldObject).is(idObject));
+        return mongoTemplate.find(query, clazz).stream()
+                .map(media -> handleUrl.buildCloudinaryUrl(imgNameExtractor.apply(media), Asset_folder))
+                .toList();
+    }
+
+    public List<String> getMediaProducts(String productId) {
+        return getMediaUrl(productId, "productId", MediaProduct.class, ASSET_FOLDER_PRODUCT, MediaProduct::getImgName);
+    }
+
+    public List<String> getMediaAvatar(String userId) {
+        return getMediaUrl(userId, "userId", MediaAvatar.class, ASSET_FOLDER_AVATAR, MediaAvatar::getImgName);
+
     }
 
 }

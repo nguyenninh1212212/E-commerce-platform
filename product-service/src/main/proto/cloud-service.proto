@@ -2,8 +2,8 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "cloud";
-
 import "shared/message.proto";
+
 
 message CloudRequest {
     string assetFolder = 1;
@@ -15,21 +15,31 @@ message CloudUrl {
     string url = 1;
 }
 
+message Media {
+  bytes media = 1;
+  int32 position = 2;
+  string resourceType = 3;
+  string assetFolder = 4;
+}
 
 message CloudRequests {
-    string assetFolder = 1;
-    string resourceType = 2; 
-    repeated bytes datas = 3;
+    string productId = 1;
+    repeated Media media = 2;
+}
 
+
+message CloudAvatarRequest {
+    Media media=1;
+    string userId=2;
 }
 
 message CloudUrls {
     repeated string url = 1;
 }
 
+message IdRequest{
+    string id = 1;
+}
 
 service CloudService {
-    rpc upload(CloudRequest) returns (CloudUrl);
-    rpc uploads(CloudRequests) returns (CloudUrls);
-    rpc deletes(CloudUrls) returns (shared.Message);
 }

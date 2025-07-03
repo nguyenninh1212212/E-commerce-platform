@@ -10,6 +10,15 @@ spring:
       strict-servlet-compliance: true
       max-file-size: 10MB
       max-request-size: 20MB
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
+
+logging:
+  level:
+    root: debug
 
 grpc:
   server:

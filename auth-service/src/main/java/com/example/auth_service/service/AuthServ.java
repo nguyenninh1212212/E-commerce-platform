@@ -1,22 +1,21 @@
 package com.example.auth_service.service;
 
-import java.net.Authenticator;
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
 import com.example.auth_service.excep.AlreadyExistException;
-import com.example.auth_service.excep.GlobalExceptionHandler;
 import com.example.auth_service.excep.NotFound;
 import com.example.auth_service.excep.UnauthorizedException;
 import com.example.auth_service.model.dto.req.AuthReq;
@@ -38,7 +37,7 @@ public class AuthServ {
     private final JwtServ jwtServ;
     private final RoleRepo roleRepo;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+    private final JwtDecoder jwtDecoder;
 
     public AuthRes register(AuthReq req) {
         Specification<Auth> spec = Specification.where(AuthSpeci.hasUsername(req.getUsername()));
@@ -60,7 +59,7 @@ public class AuthServ {
                 .createdAt(Instant.now())
                 .email(req.getEmail())
                 .fullname(req.getFullname())
-                .role(userRole)
+                .role(List.of(userRole))
                 .build();
 
         String refresh = jwtServ.refreshToken(auth);
@@ -76,6 +75,7 @@ public class AuthServ {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
             Auth auth = (Auth) authentication.getPrincipal();
+
             String access = jwtServ.accessToken(auth);
             String refresh = jwtServ.refreshToken(auth);
             auth.setRefreshToken(refresh);
@@ -87,22 +87,23 @@ public class AuthServ {
 
     }
 
-    public String refreshToken(String token) {
-        String username = jwtServ.extractUsername(token);
-        UserDetails auth = userDetailsService.loadUserByUsername(username);
-        if (jwtServ.isRefreshToken(token) == false) {
-            throw new UnauthorizedException("Invalid token or user not authorized");
+    public String refreshToken(String rawToken) {
+        Jwt jwt;
+
+        try {
+            jwt = jwtDecoder.decode(rawToken);
+        } catch (JwtException ex) {
+            throw new UnauthorizedException("Token invalid or expired");
         }
 
-        String newAccessToken = jwtServ.accessToken(auth);
-        return newAccessToken;
+        UUID userId = UUID.fromString(jwt.getSubject());
+        if (!jwtServ.isRefreshToken(jwt))
+            throw new UnauthorizedException("Token is not refresh");
 
+        Auth auth = authRepo.findById(userId)
+                .orElseThrow(() -> new NotFound("User is invalid"));
+
+        return jwtServ.accessToken(auth); // dùng JwtEncoder
     }
 
-    public void validateToken(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new UnauthorizedException("Invalid authorization header");
-        }
-        jwtServ.validateToken(authHeader.substring(7));
-    }
 }

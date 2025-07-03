@@ -9,6 +9,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - MONGO_URI=mongodb://developer:password123@mongodb:27017/productdb?authSource=admin
       - KAFKA_URI=kafka:9092
+      - AUTH-URI=http://auth-service:8080 
     ports:
       - "8083:8083"
       - "4043:4043"

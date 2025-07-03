@@ -2,6 +2,24 @@ server:
   port: 4000
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway:
+            provider: my-provider
+            client-id: gateway-client-id
+            client-secret: dwmORnygbddyMJqbWfm+Jg==
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:4000/login/oauth2/code/gateway-client"
+
+        provider:
+          my-provider:
+            issuer-uri: http://localhost:8080
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
+
   cloud:
     gateway:
       server:
@@ -12,19 +30,13 @@ spring:
               predicates:
                 - Path=/auth/**
               filters:
-                - name: JwtValidation
-                  args:
-                    enabled: true
-                    skippedRoutes:
-                      - "POST:/auth/login"
-                      - "POST:/auth/register"
 
             - id: product-router
               uri: http://localhost:8083
               predicates:
                 - Path=/products/**
               filters:
-                - StripPrefix=1
+                - TokenRelay=
 
             - id: product-service-api-docs
               uri: http://localhost:8083
@@ -32,20 +44,6 @@ spring:
                 - Path=-docs/product-service
               filters:
                 - RewritePath=-docs/product-service, /v3-docs
-
-            - id: product-coordinator-router
-              uri: http://localhost:8042
-              predicates:
-                - Path=/product-coordinator/**
-              filters:
-                - StripPrefix=1
-
-            - id: product-coordinator-service-api-docs
-              uri: http://localhost:8042
-              predicates:
-                - Path=-docs/product-coordinator-service
-              filters:
-                - RewritePath=-docs/product-coordinator-service, /v3-docs
 
             - id: variant-router
               uri: http://localhost:8089

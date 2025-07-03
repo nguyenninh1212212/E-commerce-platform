@@ -23,9 +23,9 @@ public class KafkaCosumerVariant {
         private final VariantServ variantServ;
 
         private final String TOPIC_CREATE = "variant-create";
-        private final String TOPIC_DELETE = "variant-delete";
+        private final String TOPIC_DELETE = "product-delete";
 
-        @KafkaListener(topics = TOPIC_CREATE, groupId = "variant-group")
+        @KafkaListener(topics = TOPIC_CREATE)
         public void consumeCreateEvent(
                         ConsumerRecord<String, byte[]> record)
                         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -36,9 +36,10 @@ public class KafkaCosumerVariant {
                                 .map(ToModel::toVariantsReq)
                                 .toList();
                 variantServ.createVariantList(variantsList, createVariantsRequest.getProductId());
+                log.info("Created variants for product ID: {}", createVariantsRequest.getProductId());
         }
 
-        @KafkaListener(topics = TOPIC_DELETE, groupId = "variant-group")
+        @KafkaListener(topics = TOPIC_DELETE)
         public void consumeDeleteEvent(
                         ConsumerRecord<String, byte[]> record)
                         throws com.google.protobuf.InvalidProtocolBufferException {

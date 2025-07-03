@@ -1,0 +1,32 @@
+services:
+  dbgate:
+    image: dbgate/dbgate
+    restart: always
+    container_name: dbgate
+    ports:
+      - 3000:3000
+    volumes:
+      - dbgate-data:/root/.dbgate
+    environment:
+      CONNECTIONS: con2,con3
+
+      LABEL_con2: Postgres
+      SERVER_con2: postgres
+      USER_con2: root
+      PASSWORD_con2: 123456
+      PORT_con2: 5432
+      ENGINE_con2: postgres@dbgate-plugin-postgres
+
+      LABEL_con3: MongoDB
+      URL_con3: mongodb://developer:password123@mongodb:27017/?authSource=admin
+      ENGINE_con3: mongo@dbgate-plugin-mongo
+    networks:
+      - E_COMMERCE_PLATFORM-net  
+
+volumes:
+  dbgate-data:
+    driver: local
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true

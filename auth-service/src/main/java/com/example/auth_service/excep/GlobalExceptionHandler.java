@@ -13,7 +13,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse error = new ErrorResponse(status.value(), "Field validation error: ");
+        ErrorResponse error = new ErrorResponse(status.value(), "Field validation error: " + ex.getMessage());
+        return new ResponseEntity<>(error, status);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorResponse error = new ErrorResponse(status.value(), ex.getMessage());
         return new ResponseEntity<>(error, status);
     }
 

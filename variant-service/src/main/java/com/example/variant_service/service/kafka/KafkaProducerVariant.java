@@ -56,7 +56,7 @@ public class KafkaProducerVariant {
                 .build();
         try {
             String key = event.getVariantId(0);
-            kafkaTemplate.send("inventory-delete", key, event.toByteArray());
+            kafkaTemplate.send("variant-delete", key, event.toByteArray());
             log.info("Sending event to Kafka with {} variants", variantIds.size());
         } catch (Exception e) {
             log.error("Error send event InventoryDeleteEvent : {}", e.getMessage());

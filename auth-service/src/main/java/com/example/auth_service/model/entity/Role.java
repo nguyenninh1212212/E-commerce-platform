@@ -19,12 +19,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Role {
     @Id
-    @Column(unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private ROLE name;
 
     public void orElseGet(Object object) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'orElseGet'");
     }
 }

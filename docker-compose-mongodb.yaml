@@ -11,6 +11,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin123
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - E_COMMERCE_PLATFORM-net  
 
 volumes:
   mongodb_data:

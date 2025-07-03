@@ -5,14 +5,9 @@ import java.util.List;
 import com.example.product_service.model.dto.ProductBase;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@SuperBuilder
 public class ProductUpdateReq extends ProductBase {
-    private List<String> images;
 }

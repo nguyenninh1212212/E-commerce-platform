@@ -8,13 +8,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.product_service.model.Attributes;
-import com.example.product_service.model.dto.req.ProductProtoReq;
-import com.example.product_service.model.dto.req.ProductReq;
 import com.example.product_service.model.dto.req.VariantReq;
 import com.example.product_service.model.enums.VariantsStatus;
-import com.google.errorprone.annotations.Var;
-
-import cloud.CloudUrls;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.VariantsRequest;
@@ -28,8 +23,7 @@ import shared.Attribute;
 public class KafkaProducer {
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
     private static final String VARIANT_TOPIC_CREATE = "variant-create";
-    private static final String VARIANT_TOPIC_DELETE = "variant-delete";
-    private static final String PRODUCT_TOPIC_MEDIA_DELETE = "product-media-delete";
+    private static final String VARIANT_TOPIC_DELETE = "product-delete";
 
     private static variant.Status toProtoStatus(VariantsStatus status) {
         if (status == null)
@@ -95,15 +89,4 @@ public class KafkaProducer {
         }
     }
 
-    public void sendMediaDeleteEvent(List<String> urls) {
-        CloudUrls event = CloudUrls.newBuilder()
-                .addAllUrl(urls)
-                .build();
-        try {
-            kafkaTemplate.send(PRODUCT_TOPIC_MEDIA_DELETE, UUID.randomUUID().toString(), event.toByteArray());
-            log.info("Sent media delete event for product [{}] with [{}] URLs to Kafka", urls.size());
-        } catch (Exception e) {
-            log.error("Failed to send media delete event for product [{}]", e);
-        }
-    }
 }

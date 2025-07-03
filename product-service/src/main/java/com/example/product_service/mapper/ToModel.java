@@ -16,6 +16,7 @@ import variant.VariantResponse;
 public class ToModel {
         public ProductRes toRes(Product product, List<VariantRes> variants, String sellerId) {
                 return ProductRes.builder()
+
                                 .id(product.getId())
                                 .name(product.getName())
                                 .description(product.getDescription())
@@ -26,7 +27,6 @@ public class ToModel {
                                 .reviewCount(product.getReviewCount())
                                 .attributes(product.getAttributes())
                                 .tags(product.getTag())
-                                .imageUrl(product.getImageUrl())
                                 .variants(variants)
                                 .sellerId(sellerId)
                                 .build();
@@ -56,7 +56,7 @@ public class ToModel {
                                 .name(product.getName())
                                 .sales(product.getSales())
                                 .price(product.getPrice())
-                                .image(product.getImageUrl().get(0))
                                 .build();
         }
+
 }

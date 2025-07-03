@@ -32,5 +32,4 @@ public class Product {
     private int reviewCount;
     private List<Attributes> attributes;
     private Category tag;
-    private List<String> imageUrl;
 }

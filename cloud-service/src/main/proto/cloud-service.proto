@@ -17,9 +17,13 @@ message Messages {
     string value = 1;
 }
 
+message IdRequest{
+    string id = 1;
+}
+
 message Media {
   bytes media = 1;
-  bool isThumbnail = 2;
+  int32 position = 2;
   string resourceType = 3;
   string assetFolder = 4;
 }
@@ -40,8 +44,6 @@ message CloudUrls {
 }
 
 service CloudService {
-    rpc upload(CloudRequest) returns (CloudUrl);
-    rpc uploads(CloudRequests) returns (CloudUrls);
-    rpc delete(CloudUrl) returns (Messages);
-    rpc deletes(CloudUrls) returns (Messages);
+    rpc getMediaProduct(IdRequest) returns (CloudUrls);
+    rpc getMediaAvatar(IdRequest) returns (CloudUrls);
 }

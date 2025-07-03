@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.auth_service.model.dto.req.AuthReq;
 import com.example.auth_service.model.dto.req.TokenReq;
+import com.example.auth_service.model.dto.res.AuthJwtRes;
 import com.example.auth_service.model.dto.res.AuthRes;
 import com.example.auth_service.service.AuthServ;
 import com.example.auth_service.validate.LoginValidationGroup;
@@ -31,21 +32,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<AuthRes> login(@RequestBody @Validated(LoginValidationGroup.class) AuthReq req) {
+    ResponseEntity<AuthRes> login(@RequestBody AuthReq req) {
         return ResponseEntity.ok(authServ.login(req));
     }
 
     @PostMapping("/refresh")
     ResponseEntity<String> TherefreshToken(@RequestBody TokenReq request) {
         return ResponseEntity.ok("accessToken : " + authServ.refreshToken(request.getToken()));
-    }
-
-    @GetMapping("/validate")
-    public ResponseEntity<Void> validateToken(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
-        authServ.validateToken(authHeader);
-        return ResponseEntity.ok().build();
-
     }
 
 }

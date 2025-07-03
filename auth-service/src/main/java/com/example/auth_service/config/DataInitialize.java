@@ -1,6 +1,7 @@
 package com.example.auth_service.config;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.boot.CommandLineRunner;
@@ -26,8 +27,8 @@ public class DataInitialize implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Tạo các Role nếu chưa tồn tại
-        Stream.of(ROLE.ADMIN, ROLE.USER, ROLE.MANAGER, ROLE.MARKETING, ROLE.ARTIST, ROLE.REPORT, ROLE.SUPPORT)
+        Stream.of(ROLE.ADMIN, ROLE.USER, ROLE.MANAGER, ROLE.MARKETING, ROLE.ARTIST, ROLE.REPORT,
+                ROLE.SUPPORT, ROLE.SELLER)
                 .forEach(this::createRole);
 
         String username = "admin";
@@ -41,7 +42,7 @@ public class DataInitialize implements CommandLineRunner {
                     .fullname("ADMIN")
                     .password(password)
                     .username(username)
-                    .role(roleRepo.getById(ROLE.ADMIN))
+                    .role(List.of(roleRepo.getById(ROLE.ADMIN)))
                     .build();
             return authRepo.save(auth);
         });

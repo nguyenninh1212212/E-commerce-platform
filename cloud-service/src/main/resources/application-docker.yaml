@@ -3,6 +3,9 @@ spring:
     activate:
       on-profile:
         - docker
+  data:
+    mongodb:
+      uri: ${MONGO_URI}       
   kafka:
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
