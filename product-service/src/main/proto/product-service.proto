@@ -16,9 +16,13 @@ message ProductRequest {
   int32 inventory = 4;
   double price = 5;
   string sellerId = 6;
-  Category category = 7;
-  repeated string img = 8;
-  repeated shared.Attribute attributes = 9; 
+  repeated string img = 7;
+  repeated shared.Attribute attributes = 8; 
+}
+
+message ProductUpdateRequest {
+  string productId=1;
+  ProductRequest productRequest = 2;
 }
 
 message ProductId {

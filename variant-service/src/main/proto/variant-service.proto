@@ -40,9 +40,18 @@ message VariantsRequest {
 
 message CreateVariantsRequest {
   string productId = 1;
-  repeated VariantsRequest variants = 2;
+  repeated VariantsRequest variants = 3;
 }
 
+message VariantUpdateRequest {
+  string variantId=1;
+  VariantsRequest VariantsRequest =2;
+}
+
+message UpdateVariantsRequest {
+  string productId = 1;
+  repeated VariantUpdateRequest variants = 2;
+}
 
 service VariantService {
   rpc GetVariants(GetVariantsRequest) returns (stream VariantResponse);

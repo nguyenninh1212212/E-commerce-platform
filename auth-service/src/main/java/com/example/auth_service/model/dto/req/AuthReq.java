@@ -7,6 +7,8 @@ import javax.validation.constraints.NotBlank;
 import com.example.auth_service.validate.ForgorPasswordValidate;
 import com.example.auth_service.validate.LoginValidationGroup;
 import com.example.auth_service.validate.RegisterValidationGroup;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,14 +24,8 @@ public class AuthReq {
     @NotBlank(message = "Password cannot blank", groups = { LoginValidationGroup.class, RegisterValidationGroup.class,
             ForgorPasswordValidate.class })
     private String password;
-    @NotBlank(message = "Fullname cannot blank", groups = { RegisterValidationGroup.class
-    })
-    private String fullname;
-    @NotBlank(message = "Date cannot blank", groups = { RegisterValidationGroup.class
-    })
-    private Date birth;
-    @NotBlank(message = "Email cannot blank", groups = { RegisterValidationGroup.class
-    })
+    @NotNull(message = "Profile cannot null", groups = { RegisterValidationGroup.class })
+    private ProfileReq profile;
     private String email;
 
 }

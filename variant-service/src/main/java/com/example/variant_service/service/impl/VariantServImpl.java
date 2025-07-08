@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import com.example.variant_service.grpc.client.InventoryGrpcClient;
 import com.example.variant_service.mapper.ToModel;
 import com.example.variant_service.model.dto.event.VariantCreatedEvent;
 import com.example.variant_service.model.dto.req.VariantReq;
+import com.example.variant_service.model.dto.req.VariantUpdateReq;
 import com.example.variant_service.model.dto.res.InventoryUserRes;
 import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.model.entity.Variant;
@@ -146,6 +148,51 @@ public class VariantServImpl implements VariantServ {
             log.error("Error in deleteVariantsByProductId: {}", e.getMessage(), e);
             throw new RuntimeException("Lỗi server khi xóa Variant: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void updateVariantList(List<VariantUpdateReq> reqList, String productId) {
+        Map<String, VariantUpdateReq> updateMap = toUpdateMap(reqList);
+
+        List<Variant> variants = mongoTemplate.find(
+                Query.query(Criteria.where("productId").is(productId)),
+                Variant.class);
+
+        BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Variant.class);
+
+        List<VariantCreatedEvent> updateEvents = new ArrayList<>();
+
+        for (Variant variant : variants) {
+            VariantUpdateReq req = updateMap.get(variant.getId());
+            if (req == null)
+                continue;
+
+            Update update = new Update()
+                    .set("price", req.getPrice())
+                    .set("status", req.getStatus())
+                    .set("attributes", req.getAttributes())
+                    .set("updatedAt", Instant.now());
+
+            Query query = Query.query(Criteria.where("id").is(variant.getId()));
+
+            bulkOps.updateOne(query, update);
+
+            updateEvents.add(
+                    VariantCreatedEvent.builder()
+                            .variantId(req.getId())
+                            .quantity(req.getQuantity())
+                            .build());
+        }
+        bulkOps.execute();
+        kafkaProducer.sendUpdateEvent(updateEvents);
+    }
+
+    private Map<String, VariantUpdateReq> toUpdateMap(List<VariantUpdateReq> reqList) {
+        return reqList.stream()
+                .collect(Collectors.toMap(
+                        VariantUpdateReq::getId,
+                        Function.identity(),
+                        (v1, v2) -> v2));
     }
 
 }

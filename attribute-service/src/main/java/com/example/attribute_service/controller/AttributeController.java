@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/attributes")
 @RequiredArgsConstructor
-@Tag(name = "Attributes", description = "Quản lý danh mục và thuộc tính sản phẩm")
 public class AttributeController {
 
     private final AttributeServ attributeServ;
@@ -35,6 +35,7 @@ public class AttributeController {
     }
 
     @GetMapping("/category")
+    
     public ResponseEntity<List<CategoriesDTO>> getCategories() {
         return ResponseEntity.ok(attributeServ.getCategories());
     }

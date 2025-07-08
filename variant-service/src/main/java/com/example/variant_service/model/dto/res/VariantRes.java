@@ -16,4 +16,5 @@ import lombok.experimental.SuperBuilder;
 public class VariantRes extends VariantBase {
     private String id;
     private Inventory inventory;
+    private String sku;
 }

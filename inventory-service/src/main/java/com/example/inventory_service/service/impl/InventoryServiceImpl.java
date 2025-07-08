@@ -6,9 +6,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.management.Query;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.inventory_service.Mapper.ToModel;
@@ -16,7 +15,6 @@ import com.example.inventory_service.excep.extd.AlreadyExistsException;
 import com.example.inventory_service.excep.extd.NotFoundException;
 import com.example.inventory_service.excep.extd.OutOfStockException;
 import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
-import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.model.dto.res.InventoryRes;
 import com.example.inventory_service.model.dto.res.InventoryUserRes;
 import com.example.inventory_service.model.entity.Inventory;
@@ -44,11 +42,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional
     public void createInventory(List<VariantCreatedEvent> reqList) {
-        for (VariantCreatedEvent req : reqList) {
-            Optional<Inventory> exist = repo.findByVariantId(req.getVariantId());
-            if (exist.isPresent()) {
+        reqList.forEach(req -> {
+            repo.findByVariantId(req.getVariantId()).ifPresent(inv -> {
                 throw new AlreadyExistsException(req.getVariantId());
-            }
+            });
             Inventory inventory = Inventory.builder()
                     .lastUpdateAt(Instant.now())
                     .variantId(req.getVariantId())
@@ -57,13 +54,7 @@ public class InventoryServiceImpl implements InventoryService {
                     .stockReversed(0)
                     .build();
             repo.save(inventory);
-        }
-    }
-
-    @Override
-    public void updateInventory(InventoryReq req) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInventory'");
+        });
     }
 
     @Override
@@ -115,11 +106,20 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("@CheckOwner.isOwner(#variantIds)")
     public void deleteInventorys(List<String> variantIds) {
         List<Inventory> inventories = repo.findByVariantIds(variantIds);
         if (inventories.isEmpty()) {
             throw new NotFoundException("No inventories found for the provided variant IDs.");
         }
         repo.deleteAll(inventories);
-    }  
+    }
+
+    @Override
+    public void updateInventoryList(List<VariantCreatedEvent> events) {
+        for (VariantCreatedEvent event : events) {
+            repo.updateQuantity(event.getVariantId(), event.getQuantity());
+        }
+    }
+
 }

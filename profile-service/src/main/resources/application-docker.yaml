@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile:
+        - docker
+  data:
+    mongodb:
+      uri: mongodb://developer:password123@mongodb:27017/profiledb?authSource=admin

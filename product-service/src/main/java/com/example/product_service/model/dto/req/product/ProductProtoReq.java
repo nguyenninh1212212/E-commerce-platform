@@ -1,4 +1,4 @@
-package com.example.product_service.model.dto.req;
+package com.example.product_service.model.dto.req.product;
 
 import java.util.List;
 

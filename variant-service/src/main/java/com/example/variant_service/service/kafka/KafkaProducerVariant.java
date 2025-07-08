@@ -21,20 +21,14 @@ public class KafkaProducerVariant {
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
 
     public void sendCreateEvent(List<VariantCreatedEvent> createdEvents) {
-        List<VariantEvent> variantEventArrList = new ArrayList<>();
-        for (VariantCreatedEvent variantCreatedEvent : createdEvents) {
-            try {
-                VariantEvent event = VariantEvent
+        List<VariantEvent> variantEventArrList = createdEvents.stream().map(
+                updateEvent -> VariantEvent
                         .newBuilder()
                         .setEventType("INVENTORY_CREATE")
-                        .setQuantity(variantCreatedEvent.getQuantity())
-                        .setVariantId(variantCreatedEvent.getVariantId())
-                        .build();
-                variantEventArrList.add(event);
-            } catch (Exception e) {
-                throw new RuntimeException("Error in format event: " + e.getMessage());
-            }
-        }
+                        .setQuantity(updateEvent.getQuantity())
+                        .setVariantId(updateEvent.getVariantId())
+                        .build())
+                .toList();
 
         VariantEventList variantEventList = VariantEventList.newBuilder()
                 .addAllVariantEvent(variantEventArrList)
@@ -60,6 +54,28 @@ public class KafkaProducerVariant {
             log.info("Sending event to Kafka with {} variants", variantIds.size());
         } catch (Exception e) {
             log.error("Error send event InventoryDeleteEvent : {}", e.getMessage());
+        }
+    }
+
+    public void sendUpdateEvent(List<VariantCreatedEvent> updateEvents) {
+        List<VariantEvent> variantEventArrList = updateEvents.stream().map(
+                updateEvent -> VariantEvent
+                        .newBuilder()
+                        .setEventType("INVENTORY_UPDATE")
+                        .setQuantity(updateEvent.getQuantity())
+                        .setVariantId(updateEvent.getVariantId())
+                        .build())
+                .toList();
+        VariantEventList variantEventList = VariantEventList.newBuilder()
+                .addAllVariantEvent(variantEventArrList)
+                .build();
+
+        try {
+            String key = updateEvents.get(0).getVariantId();
+            kafkaTemplate.send("inventory-update", key, variantEventList.toByteArray());
+            log.info("Sending event to Kafka with {} variants", variantEventArrList.size());
+        } catch (Exception e) {
+            log.error("Error send event InventoryCreateEvent : {}", e);
         }
     }
 

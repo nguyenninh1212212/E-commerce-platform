@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.variant_service.mapper.ToModel;
 import com.example.variant_service.model.dto.req.VariantReq;
+import com.example.variant_service.model.dto.req.VariantUpdateReq;
 import com.example.variant_service.service.VariantServ;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.CreateVariantsRequest;
 import variant.GetVariantsRequest;
+import variant.UpdateVariantsRequest;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class KafkaCosumerVariant {
 
         private final String TOPIC_CREATE = "variant-create";
         private final String TOPIC_DELETE = "product-delete";
+        private final String TOPIC_UPDATE = "variant-update";
 
         @KafkaListener(topics = TOPIC_CREATE)
         public void consumeCreateEvent(
@@ -44,8 +47,21 @@ public class KafkaCosumerVariant {
                         ConsumerRecord<String, byte[]> record)
                         throws com.google.protobuf.InvalidProtocolBufferException {
                 byte[] event = record.value();
-                GetVariantsRequest productId = GetVariantsRequest.parseFrom(event);
-                variantServ.deleteVariantsByProductId(productId.getProductId());
-                log.info("Deleted variants for product ID: {}", productId.getProductId());
+                GetVariantsRequest request = GetVariantsRequest.parseFrom(event);
+                variantServ.deleteVariantsByProductId(request.getProductId());
+                log.info("Deleted variants for product ID: {}", request.getProductId());
+        }
+
+        @KafkaListener(topics = TOPIC_UPDATE)
+        public void consumeUpdateEvent(
+                        ConsumerRecord<String, byte[]> record)
+                        throws com.google.protobuf.InvalidProtocolBufferException {
+                byte[] event = record.value();
+                UpdateVariantsRequest request = UpdateVariantsRequest.parseFrom(event);
+                List<VariantUpdateReq> vList = request.getVariantsList().stream()
+                                .map(v -> ToModel.toVariantUpdateReq(v)).toList();
+                variantServ.updateVariantList(vList, request.getProductId());
+                ;
+                log.info("Deleted variants for product ID: {}", request.getProductId());
         }
 }

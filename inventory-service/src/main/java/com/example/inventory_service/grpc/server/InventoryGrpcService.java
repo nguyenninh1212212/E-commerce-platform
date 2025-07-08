@@ -1,17 +1,13 @@
 package com.example.inventory_service.grpc.server;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 
 import com.example.inventory_service.Mapper.ToModel;
-import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
-import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.service.InventoryService;
 
-import inventory.InventoryRequest;
 import inventory.InventoryResponse;
 import inventory.InventoryResponseList;
 import inventory.InventoryUserView;
@@ -34,28 +30,6 @@ public class InventoryGrpcService extends InventoryServiceImplBase {
 
     @Value("${limit.lowStockThresold}")
     private int TheLowStockThresold;
-
-    @Override
-    public void createInventory(inventory.InventoryRequestList request,
-            io.grpc.stub.StreamObserver<inventory.Message> responseObserver) {
-        List<VariantCreatedEvent> reqList = new ArrayList<>();
-        for (InventoryRequest reqProto : request.getRequestsList()) {
-            try {
-                VariantCreatedEvent req = VariantCreatedEvent
-                        .builder()
-                        .quantity(reqProto.getStockAvailable())
-                        .variantId(reqProto.getVariantId())
-                        .build();
-                reqList.add(req);
-            } catch (Exception e) {
-                log.info("Create inventory error : ", e.getMessage());
-            }
-        }
-        inventoryService.createInventory(reqList);
-        Message message = Message.newBuilder().setValue("Inventory build successfully").build();
-        responseObserver.onNext(message);
-        responseObserver.onCompleted();
-    }
 
     @Override
     public void confirmStock(inventory.StockRequest request,

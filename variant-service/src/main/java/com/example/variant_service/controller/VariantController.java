@@ -3,6 +3,7 @@ package com.example.variant_service.controller;
 import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.service.VariantServ;
+import com.example.variant_service.util.AuthenticationUtil;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -25,6 +26,7 @@ public class VariantController {
     public void createVariants(
             @RequestBody @NotEmpty(message = "Danh sách variant không được để trống") List<@Valid VariantReq> variants,
             @RequestParam("productId") String productId) {
+
         variantServ.createVariantList(variants, productId);
     }
 

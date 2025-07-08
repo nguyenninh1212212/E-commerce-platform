@@ -24,6 +24,6 @@ public class GlobalException {
                 .message(ex.getMessage())
                 .status(ex.getStatus())
                 .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorRes);
+        return ResponseEntity.status(ex.getStatus()).body(errorRes);
     }
 }

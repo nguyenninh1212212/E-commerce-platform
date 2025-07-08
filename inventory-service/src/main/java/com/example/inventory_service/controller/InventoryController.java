@@ -1,7 +1,6 @@
 package com.example.inventory_service.controller;
 
 import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
-import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.service.InventoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryService.getAllInventory(variantId));
     }
 
-    @GetMapping
+    @GetMapping("/view")
     public ResponseEntity<?> getUserInventory(@RequestParam List<String> variantId) {
         return ResponseEntity.ok(inventoryService.getUserInventory(variantId));
     }
@@ -32,12 +31,6 @@ public class InventoryController {
     public ResponseEntity<?> createInventory(@RequestBody List<VariantCreatedEvent> req) {
         inventoryService.createInventory(req);
         return ResponseEntity.ok("Inventory created successfully");
-    }
-
-    @PutMapping
-    public ResponseEntity<?> updateInventory(@RequestBody InventoryReq req) {
-        inventoryService.updateInventory(req);
-        return ResponseEntity.ok("Inventory updated successfully");
     }
 
     @PostMapping("/reserve")

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package profile;
+
+option java_package = "profile";
+option java_multiple_files = true;
+
+import "google/protobuf/empty.proto";
+
+service ProfileService {
+    rpc GetProfile(UserId) returns (ProfileResponse);
+    rpc GetGender(google.protobuf.Empty) returns (Genders);
+}
+
+message Gender{
+    string id = 1;
+    string name = 2;
+}
+
+message Genders{
+    repeated Gender genders =1;
+}
+
+message UserId{
+    string id=1;
+}
+
+message ProfileRequest{
+    string firstname=1;
+    string lastname=2;
+    string genderId=3;
+    string userId=4;
+    string born=5;
+    string bio=6;
+}
+
+message ProfileResponse{
+    string firstname=1;
+    string lastname=2;
+    string gender=3;
+    string born=4;
+    string bio=5;
+}

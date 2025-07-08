@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public class BaseException extends RuntimeException {
-    private final String errorCode;
+    private final String message;
     private final HttpStatus status;
 
     // Getter

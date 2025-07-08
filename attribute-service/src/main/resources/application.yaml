@@ -4,9 +4,15 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${URI-ISSUER}
+
 grpc:
   server:
-    address: ${GRPC_ADDRESS}
-    port: ${GRPC_PORT}
+    port: 4042
+
 server:
-  port: ${PORT}
+  port: 8082

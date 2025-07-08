@@ -3,7 +3,6 @@ package com.example.inventory_service.service;
 import java.util.List;
 
 import com.example.inventory_service.model.dto.event.VariantCreatedEvent;
-import com.example.inventory_service.model.dto.req.InventoryReq;
 import com.example.inventory_service.model.dto.res.InventoryRes;
 import com.example.inventory_service.model.dto.res.InventoryUserRes;
 
@@ -14,7 +13,7 @@ public interface InventoryService {
 
     void createInventory(List<VariantCreatedEvent> req);
 
-    void updateInventory(InventoryReq req);
+    void updateInventoryList(List<VariantCreatedEvent> reqList);
 
     void releaseStock(int quantity, String variantId);
 

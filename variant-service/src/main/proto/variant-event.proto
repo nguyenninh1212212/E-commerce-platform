@@ -9,6 +9,7 @@ message VariantEvent{
     int32 quantity = 2;
     string eventType= 3;
 }
+
 message VariantIdsEvent{
     repeated string variantId = 1;
   }

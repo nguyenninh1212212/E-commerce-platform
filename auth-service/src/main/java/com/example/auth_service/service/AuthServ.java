@@ -26,6 +26,7 @@ import com.example.auth_service.model.enums.ROLE;
 import com.example.auth_service.repo.AuthRepo;
 import com.example.auth_service.repo.AuthSpeci;
 import com.example.auth_service.repo.RoleRepo;
+import com.example.auth_service.service.kafka.KafkaProducer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,8 +39,9 @@ public class AuthServ {
     private final RoleRepo roleRepo;
     private final AuthenticationManager authenticationManager;
     private final JwtDecoder jwtDecoder;
+    private final KafkaProducer kafkaProducer;
 
-    public AuthRes register(AuthReq req) {
+    public String register(AuthReq req) {
         Specification<Auth> spec = Specification.where(AuthSpeci.hasUsername(req.getUsername()));
         Specification<Auth> spec2 = Specification.where(AuthSpeci.hasEmail(req.getEmail()));
 
@@ -55,18 +57,14 @@ public class AuthServ {
                 .builder()
                 .username(req.getUsername())
                 .password(passwordEncoder.encode(req.getPassword()))
-                .birth(req.getBirth())
                 .createdAt(Instant.now())
                 .email(req.getEmail())
-                .fullname(req.getFullname())
                 .role(List.of(userRole))
                 .build();
-
-        String refresh = jwtServ.refreshToken(auth);
-        String access = jwtServ.accessToken(auth);
-        auth.setRefreshToken(refresh);
         authRepo.save(auth);
-        return AuthRes.builder().access(access).refresh(refresh).build();
+        kafkaProducer.sendEventProfileCreate(auth.getId().toString(), req.getProfile());
+
+        return "Register successfully!!";
 
     }
 

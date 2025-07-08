@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class VariantReq extends VariantBase {
+
     @NotNull(groups = { add.class })
-    @Min(value = 0, groups = { add.class })
-    private int quantity;
+    private String sku;
 }

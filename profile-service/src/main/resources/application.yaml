@@ -1,5 +1,22 @@
+server:
+  port: 8088
+
 spring:
   application:
     name: profile-service
-server:
-  port: 8088
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER-URI}
+
+  kafka:
+    consumer:
+      group-id: profile-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      auto-offset-reset: earliest
+
+grpc:
+  server:
+    port: 4048

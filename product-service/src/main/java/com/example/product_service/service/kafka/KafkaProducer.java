@@ -7,14 +7,20 @@ import java.util.stream.Collectors;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.product_service.mapper.ToModel;
+import com.example.product_service.mapper.ToProto;
 import com.example.product_service.model.Attributes;
-import com.example.product_service.model.dto.req.VariantReq;
+import com.example.product_service.model.dto.req.product.ProductReq;
+import com.example.product_service.model.dto.req.variant.VariantReq;
+import com.example.product_service.model.dto.req.variant.VariantUpdateReq;
 import com.example.product_service.model.enums.VariantsStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.VariantsRequest;
 import variant.CreateVariantsRequest;
 import variant.GetVariantsRequest;
+import variant.UpdateVariantsRequest;
+import variant.VariantUpdateRequest;
 import shared.Attribute;
 
 @Slf4j
@@ -24,18 +30,7 @@ public class KafkaProducer {
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
     private static final String VARIANT_TOPIC_CREATE = "variant-create";
     private static final String VARIANT_TOPIC_DELETE = "product-delete";
-
-    private static variant.Status toProtoStatus(VariantsStatus status) {
-        if (status == null)
-            return variant.Status.UNKNOWN;
-        return switch (status) {
-            case SOLD_OUT -> variant.Status.SOLD_OUT;
-            case IN_STOCK -> variant.Status.IN_STOCK;
-            case PRE_ORDER -> variant.Status.PRE_ORDER;
-            case DISCONTINUED -> variant.Status.DISCONTINUED;
-            default -> variant.Status.UNKNOWN;
-        };
-    }
+    private static final String VARIANT_TOPIC_UPDATE = "product-update";
 
     private List<Attribute> toProtoAttributes(List<Attributes> attrs) {
         return attrs.stream()
@@ -51,7 +46,7 @@ public class KafkaProducer {
 
         return VariantsRequest.newBuilder()
                 .setSku(v.getSku())
-                .setStatus(toProtoStatus(v.getStatus()))
+                .setStatus(ToProto.toProtoStatus(v.getStatus()))
                 .setPrice(v.getPrice())
                 .setQuantity(v.getQuantity())
                 .addAllAttributes(attributes)
@@ -83,6 +78,21 @@ public class KafkaProducer {
                 .build();
         try {
             kafkaTemplate.send(VARIANT_TOPIC_DELETE, productId, request.toByteArray());
+            log.info("Sent product delete [{}] with [{}] variants to Kafka", productId);
+        } catch (Exception e) {
+            log.error("Failed to send product [{}] to Kafka", productId, e);
+        }
+    }
+
+    public void sendUpdateEvent(String productId, List<VariantUpdateReq> list) {
+        List<VariantUpdateRequest> listUdpate = list.stream().map(
+                ToProto::toVariantUpdateRequest).toList();
+        try {
+            UpdateVariantsRequest event = UpdateVariantsRequest.newBuilder()
+                    .addAllVariants(listUdpate)
+                    .setProductId(productId)
+                    .build();
+            kafkaTemplate.send(VARIANT_TOPIC_UPDATE, productId, event.toByteArray());
             log.info("Sent product delete [{}] with [{}] variants to Kafka", productId);
         } catch (Exception e) {
             log.error("Failed to send product [{}] to Kafka", productId, e);

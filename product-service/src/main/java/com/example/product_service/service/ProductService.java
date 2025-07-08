@@ -1,11 +1,9 @@
 package com.example.product_service.service;
 
 import java.util.List;
-import java.util.Map;
 
-import com.example.product_service.model.dto.req.ProductReq;
-import com.example.product_service.model.dto.req.ProductUpdateReq;
-import com.example.product_service.model.dto.req.VariantReq;
+import com.example.product_service.model.dto.req.product.ProductReq;
+import com.example.product_service.model.dto.req.product.ProductUpdateReq;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;

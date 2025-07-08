@@ -57,48 +57,4 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                     .asRuntimeException());
         }
     }
-
-    @Override
-    public void createVariants(CreateVariantsRequest request, io.grpc.stub.StreamObserver<Empty> responseObserver) {
-        try {
-            List<VariantReq> variantList = new ArrayList<>();
-            request.getVariantsList().forEach(variantReq -> {
-                variantList.add(
-                        VariantReq.builder()
-                                .price(variantReq.getPrice())
-                                .status(ToModel.toStatus(variantReq.getStatus()))
-                                .sku(variantReq.getSku())
-                                .attributes(variantReq.getAttributesList().stream()
-                                        .map(attr -> new com.example.variant_service.model.Attribute(attr.getName(),
-                                                attr.getValuesList()))
-                                        .collect(Collectors.toList()))
-                                .build());
-            });
-            variantServ.createVariantList(variantList, request.getProductId());
-            responseObserver.onNext(Empty.newBuilder().build());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            log.error("Error in createVariants: {}", e.getMessage(), e);
-            responseObserver.onError(io.grpc.Status.INTERNAL
-                    .withDescription("Lỗi server khi tạo Variant: " + e.getMessage())
-                    .withCause(e)
-                    .asRuntimeException());
-        }
-    }
-
-    @Override
-    public void deleteVariantsByProductId(GetVariantsRequest request,
-            io.grpc.stub.StreamObserver<Empty> responseObserver) {
-        try {
-            variantServ.deleteVariantsByProductId(request.getProductId());
-            responseObserver.onNext(Empty.newBuilder().build());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            log.error("Error in deleteVariantsByProductId: {}", e.getMessage(), e);
-            responseObserver.onError(io.grpc.Status.INTERNAL
-                    .withDescription("Lỗi server khi xóa Variant: " + e.getMessage())
-                    .withCause(e)
-                    .asRuntimeException());
-        }
-    }
 }

@@ -10,10 +10,11 @@ services:
       - "4042:4042"
     environment: 
       - SPRING_PROFILES_ACTIVE=dev
-      - MONGODB_URI=mongodb://adminAttribute:admin123@mongodb:27017/attributedb?authSource=admin
+      - MONGODB_URI=mongodb://developer:password123@mongodb:27017/attributedb?authSource=admin
       - PORT=8082
       - GRPC_PORT=4042
       - GRPC_ADDRESS=0.0.0.0
+      - URI-ISSUER=http://auth-service:8080
     networks:
       - E_COMMERCE_PLATFORM-net
 

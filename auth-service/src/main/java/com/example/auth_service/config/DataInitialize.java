@@ -39,7 +39,6 @@ public class DataInitialize implements CommandLineRunner {
             Auth auth = Auth.builder()
                     .createdAt(Instant.now())
                     .email("abc123@gmail.com")
-                    .fullname("ADMIN")
                     .password(password)
                     .username(username)
                     .role(List.of(roleRepo.getById(ROLE.ADMIN)))

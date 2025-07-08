@@ -1,7 +1,6 @@
 package com.example.inventory_service.service.kafka;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -53,6 +52,22 @@ public class KafkaCosumeInventory {
         } catch (InvalidProtocolBufferException e) {
             log.error("❌ Error deserializing VariantEventList: {}", e.getMessage(), e);
 
+        }
+    }
+
+    @KafkaListener(topics = "inventory-update")
+    public void consumeUpdateEvent(
+            ConsumerRecord<String, byte[]> record) {
+        byte[] event = record.value();
+        try {
+            VariantEventList variantEventList = VariantEventList.parseFrom(event);
+            List<VariantCreatedEvent> createdEvents = variantEventList.getVariantEventList()
+                    .stream()
+                    .map(ToModel::toVariantEvent)
+                    .toList();
+            inventoryService.updateInventoryList(createdEvents);
+        } catch (InvalidProtocolBufferException e) {
+            log.error("❌ Error deserializing VariantEventList: {}", e.getMessage(), e);
         }
     }
 }

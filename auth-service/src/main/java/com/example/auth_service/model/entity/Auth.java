@@ -34,10 +34,9 @@ public class Auth implements UserDetails {
         private UUID id;
         private String username;
         private String password;
-        private String fullname;
         private String googleId;
-        private Date birth;
         private String email;
+        private String phoneNumber;
         @Column(name = "refresh_token", columnDefinition = "TEXT")
         private String refreshToken;
         private Instant createdAt;

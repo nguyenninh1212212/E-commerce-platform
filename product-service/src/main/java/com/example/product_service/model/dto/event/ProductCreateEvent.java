@@ -2,7 +2,7 @@ package com.example.product_service.model.dto.event;
 
 import java.util.List;
 
-import com.example.product_service.model.dto.req.VariantReq;
+import com.example.product_service.model.dto.req.variant.VariantReq;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
