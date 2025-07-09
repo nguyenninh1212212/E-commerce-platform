@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option java_multiple_files =true;
+option java_package= "address";
+
+
+service AddressService {
+    rpc getAddress (AddressRequest) returns (AddressResponse);
+}
+
+message AddressRequest{
+    string id=1;
+}
+
+message AddressResponse {
+  string fullName = 1;
+  string phoneNumber = 2;
+  string email = 3;
+  string country = 4;
+  string province = 5;
+  string district = 6;
+  string ward = 7;
+  string street = 8;
+  string addressLine2 = 9;
+  string postalCode = 10;
+  string type = 11;
+}
