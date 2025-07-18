@@ -2,8 +2,7 @@ package com.example.order_service.model.dto.req;
 
 import com.example.order_service.model.Address;
 import com.example.order_service.model.ProductPurchase;
-import com.example.order_service.model.enums.PaymentMethod;
-import com.example.order_service.model.enums.Status;
+import com.example.order_service.model.enums.PAYMENTMETHOD;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +16,6 @@ import lombok.NoArgsConstructor;
 public class OrderReq {
     private ProductPurchase productPurchase;
     private int quantity;
-    private PaymentMethod payment_method;
+    private PAYMENTMETHOD payment_method;
     private Address address;
 }

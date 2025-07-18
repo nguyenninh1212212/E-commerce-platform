@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import com.example.order_service.model.Address;
 import com.example.order_service.model.ProductPurchase;
-import com.example.order_service.model.enums.PaymentMethod;
+import com.example.order_service.model.enums.PAYMENTMETHOD;
 import com.example.order_service.model.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +20,7 @@ public class OrderRes {
     private ProductPurchase productPurchase;
     private int total_quantity;
     private double total_price;
-    private PaymentMethod payment_method;
+    private PAYMENTMETHOD payment_method;
     private boolean paid;
     private Status status;
     private Instant completed_at;

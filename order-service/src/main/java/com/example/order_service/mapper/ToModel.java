@@ -5,7 +5,7 @@ import com.example.order_service.model.VariantPurchases;
 import com.example.order_service.model.dto.req.OrderReq;
 import com.example.order_service.model.dto.res.OrderRes;
 import com.example.order_service.model.entity.Order;
-import com.example.order_service.model.enums.PaymentMethod;
+import com.example.order_service.model.enums.PAYMENTMETHOD;
 import com.example.order_service.model.enums.Status;
 import com.example.order_service.util.AuthenticationUtil;
 
@@ -17,7 +17,7 @@ public class ToModel {
         public Order toEntity(OrderReq req) {
 
                 return Order.builder()
-                                .paid(req.getPayment_method() != PaymentMethod.CASH_ON_DELIVERY)
+                                .paid(req.getPayment_method() != PAYMENTMETHOD.CASH_ON_DELIVERY)
                                 .userId(AuthenticationUtil.getUserId())
                                 .address(req.getAddress())
                                 .payment_method(req.getPayment_method())

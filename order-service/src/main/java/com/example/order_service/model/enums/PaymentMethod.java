@@ -1,9 +1,9 @@
 package com.example.order_service.model.enums;
 
-public enum PaymentMethod {
+public enum PAYMENTMETHOD{
     CREDIT_CARD,
     DEBIT_CARD,
     PAYPAL,
-    BANK_TRANSFER,
+    E_WALLET,
     CASH_ON_DELIVERY
 }

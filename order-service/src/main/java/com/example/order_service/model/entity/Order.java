@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.example.order_service.model.Address;
 import com.example.order_service.model.ProductPurchase;
-import com.example.order_service.model.enums.PaymentMethod;
+import com.example.order_service.model.enums.PAYMENTMETHOD;
 import com.example.order_service.model.enums.Status;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class Order {
     private String id;
     private String userId;
     private ProductPurchase productPurchase;
-    private PaymentMethod payment_method;
+    private PAYMENTMETHOD payment_method;
     private boolean paid;
     private Status status;
     private int quantity;

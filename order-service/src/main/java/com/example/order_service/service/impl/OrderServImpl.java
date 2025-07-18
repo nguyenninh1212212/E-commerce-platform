@@ -15,11 +15,13 @@ import org.springframework.stereotype.Service;
 import com.example.order_service.annotation.IsOrderOwner;
 import com.example.order_service.annotation.IsSeller;
 import com.example.order_service.excep.AlreadyExist;
+import com.example.order_service.excep.NotAllowed;
 import com.example.order_service.grpc.client.ProductGrpcClient;
 import com.example.order_service.mapper.ToModel;
 import com.example.order_service.model.dto.req.OrderReq;
 import com.example.order_service.model.dto.res.OrderRes;
 import com.example.order_service.model.entity.Order;
+import com.example.order_service.model.entity.PaymentMethod;
 import com.example.order_service.model.enums.Status;
 import com.example.order_service.service.OrderService;
 import com.example.order_service.service.kafka.KafkaProducer;
@@ -38,6 +40,10 @@ public class OrderServImpl implements OrderService {
     @PreAuthorize("hasRole('USER')")
     @Override
     public void createOrder(OrderReq req) {
+        if (mongoTemplate.findOne(new Query(Criteria.where("useable").is(req.getPayment_method())),
+                PaymentMethod.class).isUseable() == false) {
+            throw new NotAllowed("Payment method");
+        }
         Order order = ToModel.toEntity(req);
         Cache cache = cacheManager.getCache("ORDER_CACHE");
         String productID = order.getProductPurchase().getProductId();
