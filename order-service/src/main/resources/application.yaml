@@ -1,11 +1,50 @@
+server:
+  port: 8084
+
 spring:
   application:
     name: order-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER-URI}
   data:
     mongodb:
-      uri: mongodb://developer:Password123@localhost:27017/orderdb?authSource=admin
-server:
-  port: 8084
+      uri: "${MONGO-URI}"
+    redis:
+      host: redis
+      port: 6379
+  cache:
+    type: redis
+  kafka:
+    bootstrap-servers:
+      - kafka:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      auto-offset-reset: earliest
+      group-id: order-service
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
 grpc:
   server:
     port: 4044
+  client:
+    product-client:
+      address: ${GRPC-PRODUCT-URI}
+      negotiationType: PLAINTEXT
+    variant-client:
+      address: ${GRPC-VARIANT-URI}
+      negotiationType: PLAINTEXT
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+openApi:
+  uri: ${URI-OPENAPI}

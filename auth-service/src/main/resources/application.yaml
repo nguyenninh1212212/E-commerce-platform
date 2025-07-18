@@ -1,6 +1,13 @@
 server:
   port: 8080
+  servlet:
+    context-path:
 spring:
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://auth-service:8080
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -40,3 +47,13 @@ rsa:
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: trace
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+
+openApi:
+  uri: ${URI-OPENAPI}

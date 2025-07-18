@@ -6,11 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class Info {
-    private String name;
-    private String email;
-    private String phone;
+public class ProductPurchase {
+    private String productId;
+    private String productName;
+    private VariantPurchases variantPurchases;
 }

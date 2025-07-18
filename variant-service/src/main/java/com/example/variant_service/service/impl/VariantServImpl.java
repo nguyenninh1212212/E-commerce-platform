@@ -195,4 +195,10 @@ public class VariantServImpl implements VariantServ {
                         (v1, v2) -> v2));
     }
 
+    @Override
+    public Variant getVariantById(String variantId) {
+        Variant variant = mongoTemplate.findById(variantId, Variant.class);
+        return variant;
+    }
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.req.VariantUpdateReq;
 import com.example.variant_service.model.dto.res.VariantUserRes;
+import com.example.variant_service.model.entity.Variant;
 
 public interface VariantServ {
 
@@ -19,4 +20,6 @@ public interface VariantServ {
     void updateVariantList(List<VariantUpdateReq> req, String productId);
 
     void deleteVariantsByProductId(String productId);
+
+    Variant getVariantById(String variantId);
 }

@@ -29,10 +29,10 @@ message ProductId {
   string id = 1;
 }
 
-message Empty {
+message SellerId{
+  string id = 1;
 }
 
 service ProductService {
-  rpc CreateProduct(ProductRequest) returns (ProductId);
-  rpc DeleteProduct(ProductId) returns (Empty);
+  rpc getSellerId(ProductId) returns (SellerId);
 }

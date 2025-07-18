@@ -63,7 +63,6 @@ public class ProductController {
         }
 
         @GetMapping
-        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<ApiRes<Pagination<List<ProductFeaturedRes>>>> getAllProducts(
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int limit) {

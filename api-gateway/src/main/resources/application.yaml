@@ -12,53 +12,87 @@ spring:
             client-secret: dwmORnygbddyMJqbWfm+Jg==
             authorization-grant-type: authorization_code
             redirect-uri: "http://localhost:4000/login/oauth2/code/gateway-client"
-
         provider:
           my-provider:
-            issuer-uri: http://localhost:8080
+            issuer-uri: http://auth-service:8080
+
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080
+          issuer-uri: http://auth-service:8080
 
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: auth-service
-              uri: http://localhost:8080
-              predicates:
-                - Path=/auth/**
-              filters:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8080
+          predicates:
+            - Path=/auth/**
+          filters: []
 
-            - id: product-router
-              uri: http://localhost:8083
-              predicates:
-                - Path=/products/**
-              filters:
-                - TokenRelay=
+        - id: auth-service-swagger
+          uri: http://auth-service:8080
+          predicates:
+            - Path=/swagger/auth-service/**
+          filters:
+            - RewritePath=/swagger/auth-service/(?<path>.*), /$\{path}
 
-            - id: product-service-api-docs
-              uri: http://localhost:8083
-              predicates:
-                - Path=-docs/product-service
-              filters:
-                - RewritePath=-docs/product-service, /v3-docs
+        - id: order-service
+          uri: http://order-service:8084
+          predicates:
+            - Path=/api/orders/**
+          filters: []
 
-            - id: variant-router
-              uri: http://localhost:8089
-              predicates:
-                - Path=/variants/**
-              filters:
-                - StripPrefix=1
+        - id: order-service-swagger
+          uri: http://order-service:8084
+          predicates:
+            - Path=/swagger/order-service/**
+          filters:
+            - RewritePath=/swagger/order-service/(?<path>.*), /$\{path}
 
-            - id: variant-service-api-docs
-              uri: http://localhost:8089
-              predicates:
-                - Path=-docs/variant-service
-              filters:
-                - RewritePath=-docs/variant-service, /v3-docs
+        - id: product-router
+          uri: http://product-service:8083
+          predicates:
+            - Path=/products/**
+          filters:
+            - TokenRelay
 
-auth:
-  service:
-    url: http://localhost:8080
+        - id: product-service-swagger
+          uri: http://product-service:8083
+          predicates:
+            - Path=/swagger/product-service/**
+          filters:
+            - RewritePath=/swagger/product-service/(?<path>.*), /$\{path}
+
+        - id: variant-router
+          uri: http://variant-service:8089
+          predicates:
+            - Path=/variants/**
+          filters:
+            - StripPrefix=1
+
+        - id: variant-service-swagger
+          uri: http://variant-service:8089
+          predicates:
+            - Path=/swagger/variant-service/**
+          filters:
+            - RewritePath=/swagger/variant-service/(?<path>.*), /${path}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    disable-swagger-default-url: true
+    urls:
+      - name: auth-service
+        url: /swagger/auth-service/v3/api-docs
+      - name: product-service
+        url: /swagger/product-service/v3/api-docs
+      - name: variant-service
+        url: /swagger/variant-service/v3/api-docs
+      - name: order-service
+        url: /swagger/order-service/v3/api-docs
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

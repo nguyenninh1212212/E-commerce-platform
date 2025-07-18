@@ -24,4 +24,6 @@ public interface ProductService {
 
     void updateProduct(String id, ProductUpdateReq updates);
 
+    String getSellerId(String productId);
+
 }

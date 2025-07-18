@@ -1,13 +1,12 @@
-version: '3.8'
 
 services:
   inventory-service:
     build: .
     image: inventory-service:latest
     container_name: inventory-service
-    ports: 
-      - "8090:8090"
-      - "4050:4050" 
+    expose: 
+      - "8090"
+      - "4050" 
     environment:
     - SPRING_PROFILES_ACTIVE=docker  
     networks:

@@ -25,10 +25,10 @@ grpc:
     port: 4043
   client:
     variant-client:
-      address: static://localhost:4049
+      address: static://variant-service:4049
       negotiationType: PLAINTEXT
     cloud-client:
-      address: static://localhost:4041
+      address: static://cloud-service:4041
       negotiationType: PLAINTEXT
 
 cloudinary:

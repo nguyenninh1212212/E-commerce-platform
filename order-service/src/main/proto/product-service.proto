@@ -1,0 +1,16 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "product";
+
+
+message ProductId {
+  string id = 1;
+}
+
+message SellerId{
+  string id = 1;
+}
+
+service ProductService {
+  rpc getSellerId(ProductId) returns (SellerId);
+}

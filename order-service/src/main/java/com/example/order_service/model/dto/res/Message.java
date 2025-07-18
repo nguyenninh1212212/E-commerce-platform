@@ -1,4 +1,4 @@
-package com.example.order_service.model;
+package com.example.order_service.model.dto.res;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Customer {
-    private String id;
-    private Info info;
+public class Message {
+    private int status;
+    private String message;
 }

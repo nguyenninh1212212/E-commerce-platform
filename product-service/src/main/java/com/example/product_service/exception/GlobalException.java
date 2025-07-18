@@ -6,6 +6,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -21,6 +22,17 @@ public class GlobalException {
                                 .build();
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(response);
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ApiRes<String>> handleAccessDenied(AccessDeniedException e) {
+                ApiRes<String> response = ApiRes.<String>builder()
+                                .status(HttpStatus.FORBIDDEN.value())
+                                .data(e.getMessage())
+                                .build();
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
                                 .body(response);
         }
 

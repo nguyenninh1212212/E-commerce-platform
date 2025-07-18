@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package variant;
+
+option java_multiple_files = true;
+option java_package = "variant";
+
+import "shared/inventory.proto";
+import "shared/attribute.proto";
+
+message VariantPurchase {
+  string id = 1;
+  repeated shared.Attribute attributes = 2;
+  double price = 3;
+  string sku = 4;
+}
+
+message GetVariantsRequest {
+  string productId = 1;
+}
+
+message VariantIdRequest {
+  string id = 1;
+}
+
+service VariantService {
+  rpc GetVariantById(VariantIdRequest) returns (VariantPurchase);
+}

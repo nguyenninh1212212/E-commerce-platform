@@ -1,43 +1,31 @@
-// package com.example.product_service.grpc.server;
+package com.example.product_service.grpc.server;
 
-// import java.util.List;
-// import java.util.NoSuchElementException;
-// import java.util.stream.Collector;
-// import java.util.stream.Collectors;
+import com.example.product_service.service.ProductService;
 
-// import com.example.product_service.model.Attributes;
-// import com.example.product_service.model.Category;
-// import com.example.product_service.model.dto.req.ProductReq;
-// import com.example.product_service.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.service.GrpcService;
+import product.ProductServiceGrpc;
+import product.SellerId;
 
-// import lombok.RequiredArgsConstructor;
-// import net.devh.boot.grpc.server.service.GrpcService;
-// import product.ProductId;
-// import product.ProductServiceGrpc;
+@Slf4j
+@RequiredArgsConstructor
+@GrpcService
+public class ProductGrpcService extends ProductServiceGrpc.ProductServiceImplBase {
+    private final ProductService productService;
 
-// @RequiredArgsConstructor
-// @GrpcService
-// public class ProductGrpcService extends ProductServiceGrpc.ProductServiceImplBase {
-//         private final ProductService productService;
+    @Override
+    public void getSellerId(product.ProductId request,
+            io.grpc.stub.StreamObserver<product.SellerId> responseObserver) {
+        try {
+            String sellerId = productService.getSellerId(request.getId());
+            SellerId sellerProtoId = SellerId.newBuilder().setId(sellerId).build();
+            responseObserver.onNext(sellerProtoId);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Loi khi ket noi grpc : ", e);
 
+        }
+    }
 
-//         @Override
-//         public void deleteProduct(product.ProductId request,
-//                         io.grpc.stub.StreamObserver<product.Empty> responseObserver) {
-//                 try {
-//                         productService.deleteProductById(request.getId());
-//                         responseObserver.onNext(product.Empty.newBuilder().build());
-//                         responseObserver.onCompleted();
-//                 } catch (NoSuchElementException e) {
-//                         responseObserver.onError(io.grpc.Status.NOT_FOUND
-//                                         .withDescription("Product not found with ID: " + request.getId())
-//                                         .asRuntimeException());
-//                 } catch (Exception e) {
-//                         responseObserver.onError(io.grpc.Status.INTERNAL
-//                                         .withDescription("Failed to delete product")
-//                                         .augmentDescription(e.getMessage())
-//                                         .asRuntimeException());
-//                 }
-//         }
-
-// }
+}

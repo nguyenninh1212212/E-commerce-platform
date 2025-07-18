@@ -3,7 +3,6 @@ package com.example.variant_service.controller;
 import com.example.variant_service.model.dto.req.VariantReq;
 import com.example.variant_service.model.dto.res.VariantUserRes;
 import com.example.variant_service.service.VariantServ;
-import com.example.variant_service.util.AuthenticationUtil;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

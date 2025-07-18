@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,9 +57,7 @@ public class Security {
                                                                 "/swagger-ui.html", // HTML chính
                                                                 "/webjars/**", // Thư viện JS/CSS
                                                                 "/swagger-resources/**" // Tài nguyên bổ sung
-                                                ).permitAll()
-
-                                                .anyRequest().authenticated())
+                                                ).permitAll())
                                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
                 return http.build();

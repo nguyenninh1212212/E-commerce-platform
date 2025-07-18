@@ -12,3 +12,6 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
     bootstrap-servers:
       - ${KAFKA_URI}
+      
+openApi:
+  uri: http://localhost:4000

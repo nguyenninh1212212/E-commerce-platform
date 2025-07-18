@@ -148,4 +148,12 @@ public class ProductServImpl implements ProductService {
                 return product;
         }
 
+        @Override
+        public String getSellerId(String productId) {
+                String sellerId = mongoTemplate
+                                .findOne(new Query(Criteria.where("id").is(productId)), Product.class)
+                                .getSellerId();
+                return sellerId;
+        }
+
 }

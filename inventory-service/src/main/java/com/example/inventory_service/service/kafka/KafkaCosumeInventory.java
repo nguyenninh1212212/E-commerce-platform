@@ -14,6 +14,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import order.OrderInventoryUpdateRequest;
 import variant.event.VariantEventList;
 import variant.event.VariantIdsEvent;
 
@@ -68,6 +69,32 @@ public class KafkaCosumeInventory {
             inventoryService.updateInventoryList(createdEvents);
         } catch (InvalidProtocolBufferException e) {
             log.error("❌ Error deserializing VariantEventList: {}", e.getMessage(), e);
+        }
+    }
+
+    @KafkaListener(topics = "orders.stock-reverse-updates")
+    public void cosumerUpdateStock(ConsumerRecord<String, byte[]> record) {
+        byte[] event = record.value();
+        try {
+            OrderInventoryUpdateRequest orderInven = OrderInventoryUpdateRequest.parseFrom(event);
+            inventoryService.reserveStock(orderInven.getQuantity(), orderInven.getVariantId());
+            log.info("Release stock : ", orderInven.getVariantId());
+        } catch (Exception e) {
+            log.error("Kafka error release stock :", e);
+            throw new RuntimeException();
+        }
+    }
+
+    @KafkaListener(topics = "orders.stock-release-updates")
+    public void cosumerReleaseStock(ConsumerRecord<String, byte[]> record) {
+        byte[] event = record.value();
+        try {
+            OrderInventoryUpdateRequest orderInven = OrderInventoryUpdateRequest.parseFrom(event);
+            inventoryService.releaseStock(orderInven.getQuantity(), orderInven.getVariantId());
+            log.info("Release stock : ", orderInven.getVariantId());
+        } catch (Exception e) {
+            log.error("Kafka error release stock :", e);
+            throw new RuntimeException();
         }
     }
 }

@@ -1,0 +1,13 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    image: api-gateway:latest
+    ports:
+      - "4000:4000"
+    networks:
+      - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true
