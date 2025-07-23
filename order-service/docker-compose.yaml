@@ -13,6 +13,8 @@ services:
       - ISSUER-URI=http://auth-service:8080
       - GRPC-PRODUCT-URI=static://product-service:4043
       - GRPC-VARIANT-URI=static://variant-service:4049
+      - HOST-REDIS=redis
+      - KAFKA-URI=kafka:9092
 networks:
   E_COMMERCE_PLATFORM-net:
     external: true

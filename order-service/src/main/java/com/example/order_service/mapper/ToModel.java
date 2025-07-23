@@ -29,7 +29,7 @@ public class ToModel {
         public OrderRes toRes(Order order) {
 
                 int totalQuantity = order.getQuantity();
-                double totalPrice = order.getProductPurchase().getVariantPurchases().getPrice() * totalQuantity;
+                double totalPrice = order.getProductPurchase().getPrice() * totalQuantity;
                 return OrderRes.builder()
                                 .id(order.getId())
                                 .address(order.getAddress())
@@ -51,7 +51,6 @@ public class ToModel {
 
         public VariantPurchases toRes(VariantPurchase variantPurchase) {
                 return VariantPurchases.builder()
-                                .price(variantPurchase.getPrice())
                                 .variantId(variantPurchase.getId())
                                 .attributes(variantPurchase.getAttributesList().stream().map(ToModel::toRes).toList())
                                 .sku(variantPurchase.getSku())

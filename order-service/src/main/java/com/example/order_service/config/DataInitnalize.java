@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class DataInitnalize implements CommandLineRunner {
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public void run(String... args) throws Exception {
@@ -28,7 +28,7 @@ public class DataInitnalize implements CommandLineRunner {
     private void typePayment(PAYMENTMETHOD type) {
         PaymentMethod method = mongoTemplate.findOne(new Query(Criteria.where("type").is(type)), PaymentMethod.class);
         if (method != null) {
-            throw new AlreadyExist("Payment method was already exist");
+            return;
         } else {
             PaymentMethod newPayment = PaymentMethod.builder()
                     .type(type)

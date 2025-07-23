@@ -18,6 +18,7 @@ import com.example.order_service.excep.AlreadyExist;
 import com.example.order_service.excep.NotAllowed;
 import com.example.order_service.grpc.client.ProductGrpcClient;
 import com.example.order_service.mapper.ToModel;
+import com.example.order_service.model.dto.MessageSocketDTO;
 import com.example.order_service.model.dto.req.OrderReq;
 import com.example.order_service.model.dto.res.OrderRes;
 import com.example.order_service.model.entity.Order;
@@ -26,9 +27,12 @@ import com.example.order_service.model.enums.Status;
 import com.example.order_service.service.OrderService;
 import com.example.order_service.service.kafka.KafkaProducer;
 import com.example.order_service.util.AuthenticationUtil;
+import com.mongodb.client.result.UpdateResult;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServImpl implements OrderService {
@@ -40,7 +44,7 @@ public class OrderServImpl implements OrderService {
     @PreAuthorize("hasRole('USER')")
     @Override
     public void createOrder(OrderReq req) {
-        if (mongoTemplate.findOne(new Query(Criteria.where("useable").is(req.getPayment_method())),
+        if (mongoTemplate.findOne(new Query(Criteria.where("type").is(req.getPayment_method())),
                 PaymentMethod.class).isUseable() == false) {
             throw new NotAllowed("Payment method");
         }
@@ -54,6 +58,7 @@ public class OrderServImpl implements OrderService {
         cache.put(productID, productGrpcClient.getSellerId(productID));
         kafkaProducer.sendStockReverse(req.getProductPurchase().getVariantPurchases().getVariantId(),
                 req.getQuantity());
+
         mongoTemplate.save(order);
     }
 
@@ -62,23 +67,35 @@ public class OrderServImpl implements OrderService {
     public void deleteOrder(String orderId) {
         Query query = new Query(Criteria.where("id").is(orderId));
         mongoTemplate.findAndRemove(query, Order.class);
-
     }
 
     @IsSeller
     @Override
     public void confirmSale(String orderId, boolean isSell) {
-        Query query = new Query(Criteria.where("id").is(orderId));
-        Update update = new Update();
-        if (isSell) {
-            update.set("status", Status.PROCESSING);
+        Query query = Query.query(Criteria.where("id").is(orderId));
+        Status status = isSell ? Status.PROCESSING : Status.CANCELLED;
+        Update update = Update.update("status", status);
+        UpdateResult result = mongoTemplate.updateFirst(query, update, Order.class);
+        if (result.getModifiedCount() == 0) {
+            log.warn("No order updated with id: {}", orderId);
+            return;
         }
-        mongoTemplate.updateFirst(query, update, Order.class);
+        MessageSocketDTO messageSocket = buildOrderNotification(orderId, isSell);
+        kafkaProducer.sendCustomerNotification(messageSocket, orderId);
+    }
+
+    private MessageSocketDTO buildOrderNotification(String orderId, boolean isSell) {
+        String statusText = isSell ? "was confirm" : "was cancel";
+        String title = "The order " + statusText;
+        return MessageSocketDTO.builder()
+                .message(orderId)
+                .title(title)
+                .type("ORDER")
+                .build();
     }
 
     @Override
     public void confirmDeliver(String orderId, boolean confirm) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'confirmDeliver'");
     }
 

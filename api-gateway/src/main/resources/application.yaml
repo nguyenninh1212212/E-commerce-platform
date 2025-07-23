@@ -49,6 +49,19 @@ spring:
           filters:
             - RewritePath=/swagger/order-service/(?<path>.*), /$\{path}
 
+        - id: notification-service
+          uri: http://notification-service:8092
+          predicates:
+            - Path=/notifications/**
+          filters: []
+
+        - id: notification-service-swagger
+          uri: http://notification-service:8092
+          predicates:
+            - Path=/swagger/notification-service/**
+          filters:
+            - RewritePath=/swagger/notification-service/(?<path>.*), /$\{path}
+
         - id: product-router
           uri: http://product-service:8083
           predicates:
@@ -67,8 +80,7 @@ spring:
           uri: http://variant-service:8089
           predicates:
             - Path=/variants/**
-          filters:
-            - StripPrefix=1
+          filters: []
 
         - id: variant-service-swagger
           uri: http://variant-service:8089
@@ -92,6 +104,8 @@ springdoc:
         url: /swagger/variant-service/v3/api-docs
       - name: order-service
         url: /swagger/order-service/v3/api-docs
+      - name: notification-service
+        url: /swagger/notification-service/v3/api-docs
 
 logging:
   level:

@@ -13,4 +13,5 @@ public class ProductPurchase {
     private String productId;
     private String productName;
     private VariantPurchases variantPurchases;
+    private Double price;
 }

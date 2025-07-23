@@ -2,7 +2,6 @@ package com.example.order_service.controller;
 
 import com.example.order_service.model.dto.req.OrderReq;
 import com.example.order_service.model.dto.res.OrderRes;
-import com.example.order_service.model.enums.Status;
 import com.example.order_service.service.OrderService;
 
 import lombok.RequiredArgsConstructor;

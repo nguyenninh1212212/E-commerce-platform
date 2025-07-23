@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Message> handleException(Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        Message error = new Message(status.value(), ex.getMessage());
+        Message error = new Message(status.value(), "System error");
         return new ResponseEntity<>(error, status);
     }
 

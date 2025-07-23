@@ -20,18 +20,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class Security {
-
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                return http.authorizeHttpRequests(
-                                auth -> auth.anyRequest().permitAll())
-                                .csrf(crsf -> crsf.disable())
-                                .formLogin(flg -> flg.disable())
-                                .httpBasic(bs -> bs.disable())
-                                .oauth2ResourceServer(
-                                                oauth -> oauth.jwt(
-                                                                jwt -> jwt.jwtAuthenticationConverter(
-                                                                                jwtAuthenticationConverter())))
+                return http
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .csrf(csrf -> csrf.disable())
+                                .formLogin(form -> form.disable())
+                                .httpBasic(basic -> basic.disable())
+                                .oauth2ResourceServer(oauth -> oauth
+                                                .jwt(jwt -> jwt.jwtAuthenticationConverter(
+                                                                jwtAuthenticationConverter())))
                                 .build();
         }
 

@@ -15,5 +15,4 @@ public class VariantPurchases {
     private String variantId;
     private String sku;
     private List<Attributes> attributes;
-    private Double price;
 }
