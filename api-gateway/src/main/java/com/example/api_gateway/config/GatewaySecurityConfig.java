@@ -20,6 +20,7 @@ public class GatewaySecurityConfig {
                                                                 "/products/**",
                                                                 "/swagger/**",
                                                                 "/swagger-ui/**",
+                                                                "/variants/product/**",
                                                                 "/swagger-ui.html", // 👈 Quan trọng
                                                                 "/v3/api-docs/**",
                                                                 "/webjars/**")

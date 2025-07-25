@@ -2,6 +2,8 @@ spring:
   application:
     name: variant-service
   kafka:
+    bootstrap-servers:
+      - ${KAFKA-URI}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
@@ -11,18 +13,35 @@ spring:
       auto-offset-reset: earliest
       group-id: variant-group
       enable-auto-commit: true
-
+  data:
+    mongodb:
+      uri: ${MONGO-URI}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER-URI}
 server:
   port: 8089
 
 grpc:
   server:
     port: 4049
+    address: 0.0.0.0
   client:
     inventory-client:
-      address: static://localhost:4050
+      address: ${GRPC-INVENTORY}
       negotiationType: PLAINTEXT
 
 kafka-topic:
   variant-create: variant-create
   variant-delete: variant-delete
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+openApi:
+  uri: ${URI-OPENAPI}

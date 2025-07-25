@@ -2,6 +2,7 @@ package com.example.inventory_service.model.entity;
 
 import java.time.Instant;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,10 +21,9 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(unique = true, nullable = false)
     private String variantId;
-    private int stockTotal;
     private int stockReversed;
     private int stockAvaiable;
-    private int lowStockThresold;
     private Instant lastUpdateAt;
 }

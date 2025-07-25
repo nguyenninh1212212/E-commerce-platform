@@ -32,7 +32,7 @@ public class InventoryGrpcClient {
             return blockingStub.getUserInventory(idRequests).getViewsList().stream()
                     .map(ToModel::toUserInventoryRes).toList();
         } catch (Exception e) {
-            log.error("Error in get inventory : ", e.getMessage());
+            log.error("Error in get inventory : {}", e.getMessage());
         }
         return java.util.Collections.emptyList();
     }

@@ -4,7 +4,25 @@ server:
 spring:
   application:
     name: inventory-service
+  datasource:
+    url: ${POSTGRES-URI} 
+    username: root
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
   kafka:
+    bootstrap-servers:
+      - ${KAFKA-URI}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
@@ -17,6 +35,7 @@ spring:
 grpc:
   server:
     port: 4050
+    address: 0.0.0.0
 
 limit:
   lowStockThresold: 10

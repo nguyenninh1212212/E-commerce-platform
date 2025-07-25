@@ -1,5 +1,6 @@
 package com.example.notification_service.controller;
 
+import com.example.notification_service.model.ApiRes;
 import com.example.notification_service.model.dto.req.NotificationReq;
 import com.example.notification_service.model.dto.res.NotificationRes;
 import com.example.notification_service.model.enums.NotificationType;
@@ -38,9 +39,9 @@ public class NotificationController {
     }
 
     @GetMapping("/type")
-    public ResponseEntity<List<NotificationRes>> getNotificationsByType(
+    public ResponseEntity<ApiRes<List<NotificationRes>>> getNotificationsByType(
             @RequestParam NotificationType type) {
         List<NotificationRes> notifications = notificationService.getNotificationByType(type);
-        return ResponseEntity.ok(notifications);
+        return ResponseEntity.ok(ApiRes.<List<NotificationRes>>builder().status(200).data(notifications).build());
     }
 }

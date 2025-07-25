@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.inventory_service.Mapper.ToModel;
@@ -49,7 +48,6 @@ public class InventoryServiceImpl implements InventoryService {
             Inventory inventory = Inventory.builder()
                     .lastUpdateAt(Instant.now())
                     .variantId(req.getVariantId())
-                    .lowStockThresold(lowStockThresold)
                     .stockAvaiable(req.getQuantity())
                     .stockReversed(0)
                     .build();
@@ -77,7 +75,6 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inv = repo.findByVariantId(variantId)
                 .orElseThrow(() -> new NotFoundException(variantId));
         inv.setStockReversed(inv.getStockReversed() - quantity);
-        inv.setStockTotal(inv.getStockTotal() - quantity);
         inv.setLastUpdateAt(Instant.now());
         repo.save(inv);
     }
@@ -106,7 +103,6 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    @PreAuthorize("@CheckOwner.isOwner(#variantIds)")
     public void deleteInventorys(List<String> variantIds) {
         List<Inventory> inventories = repo.findByVariantIds(variantIds);
         if (inventories.isEmpty()) {

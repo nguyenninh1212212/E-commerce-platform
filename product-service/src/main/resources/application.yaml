@@ -23,6 +23,7 @@ logging:
 grpc:
   server:
     port: 4043
+    address: 0.0.0.0
   client:
     variant-client:
       address: static://variant-service:4049

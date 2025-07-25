@@ -33,10 +33,9 @@ public class VariantServiceGrpcClient {
                         List<VariantResponse> response = new ArrayList<>();
                         iterator.forEachRemaining(response::add);
                         long end = System.currentTimeMillis();
-                        log.info("Time to fetch and collect variants: {} ms", end - start);
-
                         return response;
                 } catch (Exception e) {
+                        log.error("Variant grpc error : {}", e.getMessage());
                         throw new RuntimeException("Variant grpc error : " + e.getMessage());
                 }
         }

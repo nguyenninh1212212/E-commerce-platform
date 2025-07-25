@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import com.example.variant_service.annotation.IsSeller;
 import com.example.variant_service.grpc.client.InventoryGrpcClient;
 import com.example.variant_service.mapper.ToModel;
 import com.example.variant_service.model.dto.event.VariantCreatedEvent;
@@ -33,13 +34,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-
 @RequiredArgsConstructor
 public class VariantServImpl implements VariantServ {
     private final MongoTemplate mongoTemplate;
     private final KafkaProducerVariant kafkaProducer;
     private final InventoryGrpcClient inventoryGrpcClient;
 
+    @Override
     public List<VariantUserRes> findByProductId(String productId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("productId").is(productId));
@@ -53,9 +54,7 @@ public class VariantServImpl implements VariantServ {
         return variants.stream()
                 .map(variant -> {
                     InventoryUserRes inventory = Optional.ofNullable(inventoryMap.get(variant.getId()))
-                            .orElseThrow(
-                                    () -> new RuntimeException("Inventory missing for variantId: " + variant.getId()));
-
+                            .orElse(new InventoryUserRes());
                     return ToModel.toUserResDto(variant, inventory);
                 })
                 .collect(Collectors.toList());
@@ -89,8 +88,9 @@ public class VariantServImpl implements VariantServ {
         kafkaProducer.sendCreateEvent(createdEvents);
     }
 
-    public void updateVariantPartial(VariantReq req, String id, String productId) {
-        Query query = new Query(Criteria.where("id").is(id).and("productId").is(productId));
+    @IsSeller
+    public void updateVariantPartial(VariantReq req, String variantId, String productId) {
+        Query query = new Query(Criteria.where("id").is(variantId).and("productId").is(productId));
         Variant variant = mongoTemplate.findOne(query, Variant.class);
         if (variant == null) {
             throw new RuntimeException("Variant not found");
@@ -124,8 +124,9 @@ public class VariantServImpl implements VariantServ {
         }
     }
 
-    public void deleteVariant(String id, String productId) {
-        Query query = new Query(Criteria.where("id").is(id).and("productId").is(productId));
+    @IsSeller
+    public void deleteVariant(String variantId, String productId) {
+        Query query = new Query(Criteria.where("id").is(variantId).and("productId").is(productId));
         mongoTemplate.remove(query, Variant.class);
     }
 

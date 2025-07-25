@@ -8,7 +8,8 @@ services:
       - "8090"
       - "4050" 
     environment:
-    - SPRING_PROFILES_ACTIVE=docker  
+    - KAFKA-URI=kafka:9092
+    - POSTGRES-URI=jdbc:postgresql://postgres:5432/e_commerce_platform_inventory
     networks:
       - E_COMMERCE_PLATFORM-net
 networks:

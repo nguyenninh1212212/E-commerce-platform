@@ -10,7 +10,11 @@ services:
     networks:
       - E_COMMERCE_PLATFORM-net
     environment:
-      - SPRING_PROFILES_ACTIVE=docker  
+      - MONGO-URI=mongodb://developer:password123@mongodb:27017/variantdb?authSource=admin  
+      - URI-OPENAPI=http://localhost:4000
+      - ISSUER-URI=http://auth-service:8080
+      - KAFKA-URI=kafka:9092
+      - GRPC-INVENTORY=static://inventory-service:4050
 networks:
   E_COMMERCE_PLATFORM-net:
     external: true      

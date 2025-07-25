@@ -17,8 +17,6 @@ public class ToModel {
                 .lastUpdateAt(inventory.getLastUpdateAt())
                 .stockAvaiable(inventory.getStockAvaiable())
                 .stockReversed(inventory.getStockReversed())
-                .lowStockThresold(inventory.getLowStockThresold())
-                .stockTotal(inventory.getStockTotal())
                 .id(inventory.getId())
                 .variantId(inventory.getVariantId())
                 .build();
@@ -42,10 +40,8 @@ public class ToModel {
         return InventoryResponse.newBuilder()
                 .setId(ivt.getId())
                 .setVariantId(ivt.getVariantId())
-                .setStockTotal(ivt.getStockTotal())
                 .setStockReserved(ivt.getStockReversed())
                 .setStockAvailable(ivt.getStockAvaiable())
-                .setLowStockThreshold(ivt.getLowStockThresold())
                 .setLastUpdatedAt(ivt.getLastUpdateAt().toString())
                 .build();
     }

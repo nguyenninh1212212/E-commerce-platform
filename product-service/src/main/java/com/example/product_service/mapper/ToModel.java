@@ -16,7 +16,6 @@ import variant.VariantResponse;
 public class ToModel {
         public ProductRes toRes(Product product, List<VariantRes> variants, String sellerId) {
                 return ProductRes.builder()
-
                                 .id(product.getId())
                                 .name(product.getName())
                                 .description(product.getDescription())
@@ -36,7 +35,6 @@ public class ToModel {
                 return variantList.stream()
                                 .map(variantResponse -> VariantRes.builder()
                                                 .id(variantResponse.getId())
-                                                .productId(productId)
                                                 .attributes(variantResponse.getAttributesList().stream()
                                                                 .map(attr -> Attributes.builder()
                                                                                 .name(attr.getName())
@@ -46,6 +44,7 @@ public class ToModel {
                                                 .status(VariantsStatus.valueOf(variantResponse.getStatus().name()))
                                                 .price(variantResponse.getPrice())
                                                 .quantity(variantResponse.getInventory().getStockAvailable())
+                                                .sku(variantResponse.getSku())
                                                 .build())
                                 .collect(java.util.stream.Collectors.toList());
         }

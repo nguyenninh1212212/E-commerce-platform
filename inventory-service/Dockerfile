@@ -10,8 +10,8 @@ RUN mvn -B package -DskipTests
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
-EXPOSE 8089
-EXPOSE 4049
+EXPOSE 8090
+EXPOSE 4050
 
 COPY --from=build /app/target/*.jar app.jar
 

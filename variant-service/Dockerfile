@@ -1,12 +1,19 @@
+### STAGE 1: Build source code
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-COPY pom.xml .
+# Copy POM trước để cache dependencies
+COPY pom.xml ./
+RUN mvn dependency:go-offline
+
+# Copy src sau để không làm vỡ cache khi code chưa đổi
 COPY src ./src
 
-RUN mvn -B package -DskipTests
+# Build app
+RUN mvn clean package -DskipTests
 
+### STAGE 2: Run the built JAR
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
