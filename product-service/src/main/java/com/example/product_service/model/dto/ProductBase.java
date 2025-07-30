@@ -31,8 +31,6 @@ public class ProductBase {
     @Min(value = 0, message = "Product price must be greater than zero", groups = { create.class })
     @NotNull(message = "Product price cannot be null", groups = { create.class })
     private double price;
-    @NotBlank(message = "Seller cannot be null", groups = { create.class })
-    private String sellerId;
     @NotNull(message = "Product attributes cannot be null", groups = { create.class })
     private List<Attributes> attributes;
     @NotNull(message = "Product tags cannot be null", groups = { create.class })

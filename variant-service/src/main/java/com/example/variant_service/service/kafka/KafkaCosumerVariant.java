@@ -39,7 +39,7 @@ public class KafkaCosumerVariant {
                                 .map(ToModel::toVariantsReq)
                                 .toList();
                 variantServ.createVariantList(variantsList, createVariantsRequest.getProductId());
-                log.info("Created variants for product ID: {}", createVariantsRequest.getProductId());
+                log.info("Created variants : {}", variantsList);
         }
 
         @KafkaListener(topics = TOPIC_DELETE)

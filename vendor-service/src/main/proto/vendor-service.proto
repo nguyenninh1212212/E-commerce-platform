@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files= true;
+option java_package = "vendor";
+
+service VendorService{
+    rpc getVendor (VendorRequest) returns (VendorResponse);
+    rpc getVendorView (VendorRequest) returns (VendorResponse);
+}
+
+message VendorRequest{
+    string userId = 1;
+}
+
+message VendorResponse{
+    string vendorId=1;
+    string vendorName=2;
+}
+

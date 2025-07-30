@@ -26,11 +26,15 @@ server:
 
 grpc:
   server:
+  
     port: 4049
     address: 0.0.0.0
   client:
     inventory-client:
       address: ${GRPC-INVENTORY}
+      negotiationType: PLAINTEXT
+    product-client:
+      address: ${GRPC-PRODUCT}
       negotiationType: PLAINTEXT
 
 kafka-topic:

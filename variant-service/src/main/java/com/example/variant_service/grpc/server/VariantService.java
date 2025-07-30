@@ -34,6 +34,7 @@ public class VariantService extends VariantServiceGrpc.VariantServiceImplBase {
                         .setId(variant.getId())
                         .setPrice(variant.getPrice())
                         .setSku(variant.getSku())
+                        .setQuantity(variant.getQuantity())
                         .setStatus(ToProto.toProtoStatus(variant.getStatus()))
                         .addAllAttributes(
                                 variant.getAttributes().stream()

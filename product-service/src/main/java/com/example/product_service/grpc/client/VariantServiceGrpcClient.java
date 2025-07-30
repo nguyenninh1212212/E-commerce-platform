@@ -24,7 +24,6 @@ public class VariantServiceGrpcClient {
 
         public List<VariantResponse> getVariantByProductId(String productId) {
                 try {
-                        long start = System.currentTimeMillis();
 
                         GetVariantsRequest request = GetVariantsRequest.newBuilder()
                                         .setProductId(productId)
@@ -32,7 +31,6 @@ public class VariantServiceGrpcClient {
                         Iterator<VariantResponse> iterator = blockingStub.getVariants(request);
                         List<VariantResponse> response = new ArrayList<>();
                         iterator.forEachRemaining(response::add);
-                        long end = System.currentTimeMillis();
                         return response;
                 } catch (Exception e) {
                         log.error("Variant grpc error : {}", e.getMessage());

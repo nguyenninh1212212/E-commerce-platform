@@ -16,7 +16,7 @@ public class ProductRes extends ProductBase {
     private double discount;
     private int rating;
     private int reviewCount;
-    private String sellerName;
+    private Vendor vendor;
     private List<VariantRes> variants;
     private List<String> imageUrl;
 

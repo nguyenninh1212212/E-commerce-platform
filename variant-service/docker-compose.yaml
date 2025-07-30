@@ -15,6 +15,7 @@ services:
       - ISSUER-URI=http://auth-service:8080
       - KAFKA-URI=kafka:9092
       - GRPC-INVENTORY=static://inventory-service:4050
+      - GRPC-PRODUCT=static://product-service:4043
 networks:
   E_COMMERCE_PLATFORM-net:
     external: true      

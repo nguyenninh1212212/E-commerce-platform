@@ -89,6 +89,20 @@ spring:
           filters:
             - RewritePath=/swagger/product-service/(?<path>.*), /$\{path}
 
+        - id: vendor-router
+          uri: http://vendor-service:8093
+          predicates:
+            - Path=/api/vendor/**
+          filters:
+            - TokenRelay
+
+        - id: vendor-service-swagger
+          uri: http://vendor-service:8093
+          predicates:
+            - Path=/swagger/vendor-service/**
+          filters:
+            - RewritePath=/swagger/vendor-service/(?<path>.*), /$\{path}
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -106,6 +120,8 @@ springdoc:
         url: /swagger/order-service/v3/api-docs
       - name: notification-service
         url: /swagger/notification-service/v3/api-docs
+      - name: vendor-service
+        url: /swagger/vendor-service/v3/api-docs
 
 logging:
   level:

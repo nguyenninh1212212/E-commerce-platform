@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Category;
+import com.example.product_service.model.dto.res.Vendor;
 import com.example.product_service.model.enums.ProductStatus;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class Product {
     private ProductStatus status;
     private int sales;
     private double price;
-    private String sellerId;
+    private String vendorId;
     private int rating;
     private int reviewCount;
     private List<Attributes> attributes;

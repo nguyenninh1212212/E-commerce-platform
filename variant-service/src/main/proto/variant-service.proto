@@ -24,6 +24,7 @@ message VariantResponse {
   shared.InventoryResponse inventory = 4;
   double price = 5;
   string sku = 6;
+  int32 quantity=7;
 }
 
 message VariantPurchase {
@@ -51,7 +52,7 @@ message VariantsRequest {
 
 message CreateVariantsRequest {
   string productId = 1;
-  repeated VariantsRequest variants = 3;
+  repeated VariantsRequest variants = 2;
 }
 
 message VariantUpdateRequest {

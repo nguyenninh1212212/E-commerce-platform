@@ -6,6 +6,7 @@ import com.example.product_service.model.Attributes;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
 import com.example.product_service.model.dto.res.VariantRes;
+import com.example.product_service.model.dto.res.Vendor;
 import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.VariantsStatus;
 
@@ -14,7 +15,7 @@ import variant.VariantResponse;
 
 @UtilityClass
 public class ToModel {
-        public ProductRes toRes(Product product, List<VariantRes> variants, String sellerId) {
+        public ProductRes toRes(Product product, List<VariantRes> variants, Vendor vendor) {
                 return ProductRes.builder()
                                 .id(product.getId())
                                 .name(product.getName())
@@ -26,8 +27,8 @@ public class ToModel {
                                 .reviewCount(product.getReviewCount())
                                 .attributes(product.getAttributes())
                                 .tags(product.getTag())
+                                .vendor(vendor)
                                 .variants(variants)
-                                .sellerId(sellerId)
                                 .build();
         }
 

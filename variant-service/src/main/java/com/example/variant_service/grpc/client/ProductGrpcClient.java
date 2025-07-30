@@ -19,7 +19,8 @@ public class ProductGrpcClient {
             return blockingStub.getSellerId(productIdProto).getId();
         } catch (Exception e) {
             log.error("Failed to get sellerId for productId: {}", productId, e);
-            throw new RuntimeException("Failed to get sellerId from product-service via gRPC", e);
+            return null; // hoặc Optional.empty()
         }
     }
+
 }

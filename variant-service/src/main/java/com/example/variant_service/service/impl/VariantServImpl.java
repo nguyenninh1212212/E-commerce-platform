@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class VariantServImpl implements VariantServ {
         List<Variant> variants = mongoTemplate.find(query, Variant.class);
         List<String> variantIds = variants.stream().map(Variant::getId).toList();
         List<InventoryUserRes> inventoryUserReses = inventoryGrpcClient.getUserInventorys(variantIds);
-        log.info("inventoryUserReses : ", inventoryUserReses);
+        log.info("inventoryUserReses : {} ", inventoryUserReses);
         Map<String, InventoryUserRes> inventoryMap = inventoryUserReses.stream()
                 .collect(Collectors.toMap(InventoryUserRes::getVariantId, Function.identity()));
 
@@ -63,29 +64,33 @@ public class VariantServImpl implements VariantServ {
 
     @Override
     public void createVariantList(List<VariantReq> variants, String productId) {
-        List<Variant> variantList = new ArrayList<>();
-        List<Integer> quantities = new ArrayList<>();
         List<VariantCreatedEvent> createdEvents = new ArrayList<>();
+
         for (VariantReq variantReq : variants) {
             Variant variant = ToModel.toEntity(variantReq, productId);
-            variantList.add(variant);
-            quantities.add(variantReq.getQuantity());
+
+            try {
+                Variant savedVariant = mongoTemplate.insert(variant);
+                log.info("✅ Inserted variant: {}", savedVariant);
+
+                VariantCreatedEvent event = VariantCreatedEvent.builder()
+                        .variantId(savedVariant.getId())
+                        .quantity(variantReq.getQuantity())
+                        .build();
+
+                createdEvents.add(event);
+
+            } catch (Exception e) {
+                log.error("❌ Failed to insert variant with SKU {}: {}", variant.getSku(), e.getMessage(), e);
+            }
         }
-        List<Variant> insertedVariants = new ArrayList<>(mongoTemplate.insert(variantList, Variant.class));
 
-        for (int i = 0; i < insertedVariants.size(); i++) {
-            Variant variant = insertedVariants.get(i);
-            Integer quantity = quantities.get(i);
-
-            VariantCreatedEvent variantCreatedEvent = VariantCreatedEvent
-                    .builder()
-                    .variantId(variant.getId())
-                    .quantity(quantity)
-                    .build();
-
-            createdEvents.add(variantCreatedEvent);
+        if (!createdEvents.isEmpty()) {
+            kafkaProducer.sendCreateEvent(createdEvents);
+            log.info("✅ Sent Kafka create events: {}", createdEvents);
+        } else {
+            log.warn("⚠️ No variant was inserted, skipping Kafka event send.");
         }
-        kafkaProducer.sendCreateEvent(createdEvents);
     }
 
     @IsSeller

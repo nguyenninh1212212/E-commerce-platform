@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.product_service.annotation.IsOwner;
-import com.example.product_service.annotation.SellerOnly;
 import com.example.product_service.exception.UnauthorizedException;
 import com.example.product_service.exception.exceted.NotFoundException;
 import com.example.product_service.grpc.client.VariantServiceGrpcClient;
+import com.example.product_service.grpc.client.VendorServiceGrpcClient;
 import com.example.product_service.mapper.ToModel;
 import com.example.product_service.model.dto.res.VariantRes;
+import com.example.product_service.model.dto.res.Vendor;
 import com.example.product_service.model.dto.req.product.ProductReq;
 import com.example.product_service.model.dto.req.product.ProductUpdateReq;
 import com.example.product_service.model.dto.req.variant.VariantReq;
@@ -42,12 +43,14 @@ import variant.VariantResponse;
 public class ProductServImpl implements ProductService {
         private final MongoTemplate mongoTemplate;
         private final VariantServiceGrpcClient variantServiceGrpcClient;
+        private final VendorServiceGrpcClient vendorServiceGrpcClient;
         private final KafkaProducer kafkaProducer;
         private final ObjectMapper objectMapper;
 
-        @SellerOnly
         @Override
         public String addProduct(ProductReq req) {
+                Vendor vendor = vendorServiceGrpcClient.getVendor();
+                log.info("Vendor : {}", vendor.getVendorId());
                 Product product = Product.builder()
                                 .name(req.getName())
                                 .price(req.getPrice())
@@ -58,7 +61,7 @@ public class ProductServImpl implements ProductService {
                                 .rating(0)
                                 .attributes(req.getAttributes())
                                 .sales(req.getSales())
-                                .sellerId(AuthenticationUtil.getSub())
+                                .vendorId(vendor.getVendorId())
                                 .build();
                 mongoTemplate.save(product);
 
@@ -74,9 +77,10 @@ public class ProductServImpl implements ProductService {
         public ProductRes getProductById(String id) {
                 Product product = findProductOrThrow(id);
                 List<VariantResponse> variantList = variantServiceGrpcClient.getVariantByProductId(id);
-                List<VariantRes> variants = variantList != null ? ToModel.toVariantsRes(variantList, id)
-                                : new java.util.ArrayList<>();
-                ProductRes res = ToModel.toRes(product, variants, product.getSellerId());
+                List<VariantRes> variants = ToModel.toVariantsRes(variantList, id);
+                log.info("[Variant : {}] ", variantList);
+                Vendor vendor = vendorServiceGrpcClient.getVendorView(product.getVendorId());
+                ProductRes res = ToModel.toRes(product, variants, vendor);
                 return res;
         }
 
@@ -98,7 +102,7 @@ public class ProductServImpl implements ProductService {
 
         @Override
         public Pagination<List<ProductFeaturedRes>> getProductsBySellerId(String sellerId) {
-                Criteria criteria = Criteria.where("sellerId").is(sellerId);
+                Criteria criteria = Criteria.where("vendorId").is(sellerId);
                 return getProductCriteria(criteria, 0, 20);
         }
 
@@ -110,7 +114,6 @@ public class ProductServImpl implements ProductService {
 
         }
 
-        @SellerOnly
         @IsOwner
         @Override
         public void deleteProductById(String id) {
@@ -124,7 +127,6 @@ public class ProductServImpl implements ProductService {
 
         }
 
-        @SellerOnly
         @IsOwner
         public void updateProduct(String id, ProductUpdateReq updates) {
                 Query query = new Query(Criteria.where("id").is(id));
@@ -152,7 +154,7 @@ public class ProductServImpl implements ProductService {
         public String getSellerId(String productId) {
                 String sellerId = mongoTemplate
                                 .findOne(new Query(Criteria.where("id").is(productId)), Product.class)
-                                .getSellerId();
+                                .getVendorId();
                 return sellerId;
         }
 

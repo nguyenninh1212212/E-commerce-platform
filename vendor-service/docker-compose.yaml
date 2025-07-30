@@ -1,0 +1,19 @@
+  services:
+    vendor-service:
+      build: .
+      image: vendor-service:latest
+      container_name: vendor-service
+      environment:
+        - ISSUER-URI=http://auth-service:8080
+        - DB_URL=jdbc:postgresql://postgres:5432/E_COMMERCE_PLATFORM_VENDOR
+        - DB_USER=root
+        - DB_PASSWORD=123456
+        - OPENAPI-URI=http://localhost:4000
+      expose:
+        - "8093"
+        - "4093"
+      networks:
+        - E_COMMERCE_PLATFORM-net
+  networks:
+    E_COMMERCE_PLATFORM-net:
+      external: true      

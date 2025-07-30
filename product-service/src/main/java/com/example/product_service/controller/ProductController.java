@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.product_service.annotation.SellerOnly;
 import com.example.product_service.model.dto.req.product.ProductReq;
 import com.example.product_service.model.dto.req.product.ProductUpdateReq;
 import com.example.product_service.model.dto.req.variant.VariantReq;

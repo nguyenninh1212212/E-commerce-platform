@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@checkIsOwner.IsSeller(#variantId) and hasRole('SELLER')")
+@PreAuthorize("@checkIsOwner.IsSeller(#variantId)")
 public @interface IsSeller {
 
 }

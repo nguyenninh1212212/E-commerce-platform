@@ -15,6 +15,9 @@ services:
       - GRPC-VARIANT-URI=static://variant-service:4049
       - HOST-REDIS=redis
       - KAFKA-URI=kafka:9092
+    volumes:
+      - ~/.m2:/root/.m2
+  
 networks:
   E_COMMERCE_PLATFORM-net:
     external: true

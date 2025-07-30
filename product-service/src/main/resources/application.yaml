@@ -31,6 +31,9 @@ grpc:
     cloud-client:
       address: static://cloud-service:4041
       negotiationType: PLAINTEXT
+    vendor-client:
+      address: static://vendor-service:4093
+      negotiationType: PLAINTEXT
 
 cloudinary:
   resourceFile: image

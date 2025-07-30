@@ -28,7 +28,7 @@ public class DataInitialize implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Stream.of(ROLE.ADMIN, ROLE.USER, ROLE.MANAGER, ROLE.MARKETING, ROLE.ARTIST, ROLE.REPORT,
-                ROLE.SUPPORT, ROLE.SELLER)
+                ROLE.SUPPORT)
                 .forEach(this::createRole);
 
         String username = "admin";

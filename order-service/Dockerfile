@@ -1,27 +1,28 @@
-# -------- BUILD STAGE --------
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+# Stage 1: Build the application
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
-WORKDIR /app
+WORKDIR /build
 
-# Copy dependencies files first for cache optimization
+# Copy pom.xml and download dependencies first (cache-friendly)
 COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy source code
 COPY src ./src
 
-# Build with skip tests to speed up (optional: remove -DskipTests in prod)
+# Build the project
 RUN mvn clean package -DskipTests
 
-# -------- RUNTIME STAGE --------
-FROM openjdk:21-jdk-slim AS runner
+# Stage 2: Run the application
+FROM openjdk:21-slim
 
 WORKDIR /app
 
-# Copy built JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Copy jar from build stage
+COPY --from=build /build/target/order-service-0.0.1-SNAPSHOT.jar app.jar
 
-# Optional: use non-root user in prod
-# RUN useradd -ms /bin/bash appuser && chown -R appuser /app
-# USER appuser
+# Expose ports
+EXPOSE 8084
 
-EXPOSE 8080
-
+# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]

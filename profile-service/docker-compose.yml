@@ -1,0 +1,16 @@
+
+services:
+  profile-service:
+    build: .
+    container_name: profile-service
+    image: profile-service:latest
+    expose:
+      - "8088"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - E_COMMERCE_PLATFORM-net
+
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true
