@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "mail";
+
+message MailRequest{
+    string to = 1 ;
+    string content = 2;
+    string subject = 3;
+}
