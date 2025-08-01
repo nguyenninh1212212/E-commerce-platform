@@ -31,7 +31,10 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
     bootstrap-servers:
       - ${BOOTSTRAP-SERVER}
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
 grpc:
   client:
     profile-client:

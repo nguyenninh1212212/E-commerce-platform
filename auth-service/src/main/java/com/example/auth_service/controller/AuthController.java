@@ -34,9 +34,8 @@ public class AuthController {
     }
 
     @PostMapping("/login/confirm-otp")
-    ResponseEntity<String> confirmOtp(@RequestBody OtpReq req) {
-        authServ.verifyOtpAndLogin(req);
-        return ResponseEntity.ok("Otp confirm");
+    ResponseEntity<AuthRes> confirmOtp(@RequestBody OtpReq req) {
+        return ResponseEntity.ok(authServ.verifyOtpAndLogin(req));
     }
 
     @PostMapping("/refresh")

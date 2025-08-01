@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -93,18 +94,12 @@ public class Security {
         }
 
         @Bean
-        public JedisConnectionFactory jedisConnectionFactory() {
-                return new JedisConnectionFactory();
-        }
-
-        @Bean
-        public RedisTemplate<String, Object> redisTemplate() {
-                RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-                redisTemplate.setConnectionFactory(jedisConnectionFactory());
-                Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(
-                                Object.class);
-                redisTemplate.setDefaultSerializer(jackson2JsonRedisSerializer);
-                return redisTemplate;
+        public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
+                RedisTemplate<String, String> template = new RedisTemplate<>();
+                template.setConnectionFactory(factory);
+                template.setKeySerializer(new StringRedisSerializer());
+                template.setValueSerializer(new StringRedisSerializer());
+                return template;
         }
 
 }

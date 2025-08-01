@@ -38,7 +38,9 @@ import com.example.auth_service.repo.RoleRepo;
 import com.example.auth_service.service.kafka.KafkaProducer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServ {
@@ -107,8 +109,9 @@ public class AuthServ {
         Auth auth = authRepo.findByUsername(req.getUsername())
                 .orElseThrow(() -> new NotFound("User"));
 
-        String cacheKey = "log:" + auth.getEmail();
+        String cacheKey = "otp:" + auth.getEmail();
         String cachedOtp = redisTemplate.opsForValue().get(cacheKey);
+        log.info("CarchOTP : {} , cacheKey : {}", cachedOtp, cacheKey);
         if (cachedOtp == null || !cachedOtp.equals(req.getOtp())) {
             throw new UnauthorizedException("OTP invalid or expired");
         }
@@ -177,7 +180,7 @@ public class AuthServ {
         mail.setEmail(email);
         mail.setSubject("Confirm OTP");
         kafkaProducer.sendEventOtp(mail);
-        redisTemplate.opsForValue().set(key + email, otp, Duration.ofMillis(1));
+        redisTemplate.opsForValue().set(key + email, otp, Duration.ofMillis(5));
     }
 
 }
