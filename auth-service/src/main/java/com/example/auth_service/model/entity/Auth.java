@@ -41,7 +41,6 @@ public class Auth implements UserDetails {
         private String refreshToken;
         private Instant createdAt;
         private Instant updatedAt;
-        private Instant deletedAt;
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(name = "auth_role", joinColumns = @JoinColumn(name = "auth_id"), inverseJoinColumns = @JoinColumn(name = "role_name"))
         private List<Role> role;

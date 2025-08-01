@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.auth_service.model.dto.req.AuthReq;
+import com.example.auth_service.model.dto.req.OtpReq;
 import com.example.auth_service.model.dto.req.TokenReq;
 import com.example.auth_service.model.dto.res.AuthRes;
 import com.example.auth_service.service.AuthServ;
@@ -26,9 +27,16 @@ public class AuthController {
         return ResponseEntity.ok(authServ.register(req));
     }
 
-    @PostMapping("/login")
-    ResponseEntity<AuthRes> login(@RequestBody AuthReq req) {
-        return ResponseEntity.ok(authServ.login(req));
+    @PostMapping("/login/send-otp")
+    ResponseEntity<String> login(@RequestBody AuthReq req) {
+        authServ.login(req);
+        return ResponseEntity.ok("Otp was sent");
+    }
+
+    @PostMapping("/login/confirm-otp")
+    ResponseEntity<String> confirmOtp(@RequestBody OtpReq req) {
+        authServ.verifyOtpAndLogin(req);
+        return ResponseEntity.ok("Otp confirm");
     }
 
     @PostMapping("/refresh")

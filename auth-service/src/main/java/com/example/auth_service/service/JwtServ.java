@@ -57,7 +57,6 @@ public class JwtServ {
                 .expiresAt(Instant.now().plus(Duration.ofDays(7)))
                 .subject(auth.getId().toString())
                 .claim("is_refresh", true)
-                .claim("scope", List.of("read", "write"))
                 .build();
         Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims));
         return jwt.getTokenValue();
