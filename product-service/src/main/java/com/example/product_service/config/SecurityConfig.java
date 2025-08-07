@@ -1,7 +1,14 @@
 package com.example.product_service.config;
 
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -49,5 +56,15 @@ public class SecurityConfig {
                 JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
                 authenticationConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
                 return authenticationConverter;
+        }
+
+        @Bean
+        public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+                RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofMinutes(10))
+                                .disableCachingNullValues()
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair
+                                                .fromSerializer(new Jackson2JsonRedisSerializer<>(Object.class)));
+                return RedisCacheManager.builder(connectionFactory).cacheDefaults(configuration).build();
         }
 }

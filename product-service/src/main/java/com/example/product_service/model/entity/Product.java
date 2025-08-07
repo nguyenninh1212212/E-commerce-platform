@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.example.product_service.model.Attributes;
 import com.example.product_service.model.Category;
-import com.example.product_service.model.dto.res.Vendor;
 import com.example.product_service.model.enums.ProductStatus;
 
 import lombok.AllArgsConstructor;

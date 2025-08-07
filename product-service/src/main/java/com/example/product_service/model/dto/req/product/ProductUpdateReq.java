@@ -1,6 +1,5 @@
 package com.example.product_service.model.dto.req.product;
 
-import java.util.List;
 
 import com.example.product_service.model.dto.ProductBase;
 

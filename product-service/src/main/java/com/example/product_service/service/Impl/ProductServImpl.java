@@ -3,17 +3,15 @@ package com.example.product_service.service.Impl;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.product_service.annotation.IsOwner;
-import com.example.product_service.exception.UnauthorizedException;
 import com.example.product_service.exception.exceted.NotFoundException;
 import com.example.product_service.grpc.client.VariantServiceGrpcClient;
 import com.example.product_service.grpc.client.VendorServiceGrpcClient;
@@ -22,7 +20,6 @@ import com.example.product_service.model.dto.res.VariantRes;
 import com.example.product_service.model.dto.res.Vendor;
 import com.example.product_service.model.dto.req.product.ProductReq;
 import com.example.product_service.model.dto.req.product.ProductUpdateReq;
-import com.example.product_service.model.dto.req.variant.VariantReq;
 import com.example.product_service.model.dto.res.Pagination;
 import com.example.product_service.model.dto.res.ProductFeaturedRes;
 import com.example.product_service.model.dto.res.ProductRes;
@@ -30,7 +27,6 @@ import com.example.product_service.model.entity.Product;
 import com.example.product_service.model.enums.ProductStatus;
 import com.example.product_service.service.ProductService;
 import com.example.product_service.service.kafka.KafkaProducer;
-import com.example.product_service.util.AuthenticationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -74,6 +70,7 @@ public class ProductServImpl implements ProductService {
         }
 
         @Override
+        @Cacheable(value = "PRODUCT", key = "#id")
         public ProductRes getProductById(String id) {
                 Product product = findProductOrThrow(id);
                 List<VariantResponse> variantList = variantServiceGrpcClient.getVariantByProductId(id);
@@ -95,19 +92,21 @@ public class ProductServImpl implements ProductService {
         }
 
         @Override
+        @Cacheable(value = "PRODUCTS", key = "#id")
         public Pagination<List<ProductFeaturedRes>> getAllProducts(int page, int limit) {
                 Criteria criteria = new Criteria();
                 return getProductCriteria(criteria, page, limit);
         }
 
         @Override
+        @Cacheable(value = "PRODUCTS-SELLER", key = "#sellerId")
         public Pagination<List<ProductFeaturedRes>> getProductsBySellerId(String sellerId) {
                 Criteria criteria = Criteria.where("vendorId").is(sellerId);
                 return getProductCriteria(criteria, 0, 20);
         }
 
         @Override
-
+        @Cacheable(value = "PRODUCTS-TAG", key = "#tag")
         public Pagination<List<ProductFeaturedRes>> getProductsByTag(String tag) {
                 Criteria criteria = Criteria.where("tag").is(tag);
                 return getProductCriteria(criteria, 0, 20);

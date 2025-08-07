@@ -1,19 +1,15 @@
 package com.example.product_service.service.kafka;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.example.product_service.mapper.ToModel;
 import com.example.product_service.mapper.ToProto;
 import com.example.product_service.model.Attributes;
-import com.example.product_service.model.dto.req.product.ProductReq;
 import com.example.product_service.model.dto.req.variant.VariantReq;
 import com.example.product_service.model.dto.req.variant.VariantUpdateReq;
-import com.example.product_service.model.enums.VariantsStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import variant.VariantsRequest;

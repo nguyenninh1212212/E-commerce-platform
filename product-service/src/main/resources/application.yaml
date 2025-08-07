@@ -20,6 +20,9 @@ spring:
       host: ${REDIS-HOST}
       port: 6534
 
+  cache:
+    type: redis
+
 logging:
   level:
     root: debug
