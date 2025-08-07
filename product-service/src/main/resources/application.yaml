@@ -8,13 +8,17 @@ spring:
     multipart:
       enabled: true
       strict-servlet-compliance: true
-      max-file-size: 10MB
-      max-request-size: 20MB
+      max-file-size: 5MB
+      max-request-size: 5MB
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${URI-ISSUER}
+  data:
+    redis:
+      host: ${REDIS-HOST}
+      port: 6534
 
 logging:
   level:

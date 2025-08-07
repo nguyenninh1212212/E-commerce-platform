@@ -17,5 +17,4 @@ public class GlobalException {
         return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Có thể thêm nhiều @ExceptionHandler khác nếu muốn
 }

@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class Message {
     private int status;
     private String message;
+
+    public static Message of(int status, String message) {
+        return Message.of(status, message);
+    }
 }

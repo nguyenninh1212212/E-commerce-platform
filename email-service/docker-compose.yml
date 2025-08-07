@@ -1,0 +1,20 @@
+
+services:
+  auth-service:
+    build: .
+    container_name: email-service
+    image: email-service:latest  
+    expose:
+      - "8094"
+    environment:
+     - URI-OPENAPI=http://localhost:4000 
+     - ISSUER-URI=http://auth-service:8080
+     - BOOTSTRAP-SERVER=kafka:9092
+     - USERNAME-MAIL=ninh56099@gmail.com
+     - PASSWORD-MAIL=oaue lupz slae bzsi
+    networks:
+      - E_COMMERCE_PLATFORM-net
+    
+networks:
+  E_COMMERCE_PLATFORM-net:
+    external: true
