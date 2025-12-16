@@ -33,7 +33,7 @@ spring:
       - ${BOOTSTRAP-SERVER}
   data:
     redis:
-      host: localhost
+      host: ${HOST-REDIS}
       port: 6379
 grpc:
   client:

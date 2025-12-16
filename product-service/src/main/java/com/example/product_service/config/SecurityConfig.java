@@ -61,7 +61,7 @@ public class SecurityConfig {
         @Bean
         public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
                 RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(10))
+                                .entryTtl(Duration.ofMinutes(2))
                                 .disableCachingNullValues()
                                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                                                 .fromSerializer(new Jackson2JsonRedisSerializer<>(Object.class)));

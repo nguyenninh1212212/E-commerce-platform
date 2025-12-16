@@ -9,6 +9,7 @@ services:
       - MONGO_URI=mongodb://developer:password123@mongodb:27017/productdb?authSource=admin
       - KAFKA_URI=kafka:9092
       - URI-ISSUER=http://auth-service:8080 
+      - REDIS-HOST=redis
     expose:
       - "8083"
       - "4043"

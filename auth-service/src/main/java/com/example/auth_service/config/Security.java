@@ -52,7 +52,7 @@ public class Security {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/**",
+                                                .requestMatchers(
                                                                 "/auth/**",
                                                                 "/v3/api-docs/**", // JSON spec của Swagger
                                                                 "/swagger-ui/**", // Tài nguyên UI (CSS, JS)

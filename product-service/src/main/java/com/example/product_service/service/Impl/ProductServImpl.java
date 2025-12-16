@@ -92,7 +92,6 @@ public class ProductServImpl implements ProductService {
         }
 
         @Override
-        @Cacheable(value = "PRODUCTS", key = "#id")
         public Pagination<List<ProductFeaturedRes>> getAllProducts(int page, int limit) {
                 Criteria criteria = new Criteria();
                 return getProductCriteria(criteria, page, limit);
